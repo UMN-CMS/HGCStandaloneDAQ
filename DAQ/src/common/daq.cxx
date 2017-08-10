@@ -1,0 +1,12 @@
+#include "uhal/uhal.hpp"
+
+#include <iostream>
+
+
+
+int main(int argc, char *argv[]) {
+
+    std::cout << "Test!\n";
+
+    return 0;
+}
