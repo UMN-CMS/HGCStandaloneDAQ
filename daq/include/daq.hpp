@@ -6,4 +6,11 @@
 #include "rdout.hpp"
 #include "dataformat.hpp"
 
+#include <fstream>
+
+void write_data(std::ofstream& fout, std::vector<uint32_t> data) {
+    fout.write(reinterpret_cast<char*>(&data[0]), data.size() * sizeof(data[0]));
+    fout.flush();
+}
+
 #endif

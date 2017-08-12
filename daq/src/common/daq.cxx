@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <cstdio>
+#include <fstream>
 
 #define MAXEVENTS 100
 
@@ -19,11 +20,9 @@ int main(int argc, char *argv[]) {
     /*** initialization ***/
     uhal::setLogLevelTo(uhal::Error());// otherwise there's a bunch of crap printed out
 
-    // iterators
     int event;
-
     std::vector<uhal::HwInterface> rdouts;
-    std::vector<std::vector<std::string> > active_fifos;
+    std::ofstream fout("test.raw", std::ofstream::binary);
 
 
     /*** set up connections ***/
@@ -44,7 +43,7 @@ int main(int argc, char *argv[]) {
             std::cout << std::hex << const0 << " " << const1 << " instead.\n";
             exit(1);
         }          
-    }// end loop over rdouts
+    }
 
 
     /*** main event loop ***/
@@ -61,6 +60,7 @@ int main(int argc, char *argv[]) {
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
 
             // TODO write the event data
+            write_data(fout, ev_data);
 
             // check if the fifo is empty, if not then read til it is empty
             while(!get_word(rdout, EMPTY)) {
@@ -75,7 +75,9 @@ int main(int argc, char *argv[]) {
     }// end loop over events
 
 
-    // closing actions
+    /*** closing ***/
+    fout.close();
+
     // maybe use multiple threads?
 
     return 0;

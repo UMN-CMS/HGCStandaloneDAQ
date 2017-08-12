@@ -1,3 +1,11 @@
+#!/bin/bash
+
+#
+# This removes all of the compiled files so the Makefile builds from scratch.
+# Sometimes this is needed because the Makefile doesn't think anything needs
+# to be recompiled, but it really does.
+#
+
 rm -rf bin/
 rm -rf lib/
 rm -rf obj/
