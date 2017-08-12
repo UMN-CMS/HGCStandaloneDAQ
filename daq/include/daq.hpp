@@ -4,5 +4,6 @@
 #include "uhal/uhal.hpp"
 #include "ipbus_utils.hpp"
 #include "rdout.hpp"
+#include "dataformat.hpp"
 
 #endif
