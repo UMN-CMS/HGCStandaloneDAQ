@@ -60,7 +60,9 @@ int main(int argc, char *argv[]) {
             // get the event data
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
 
-            // TODO check fifo empty, if not then read til empty
+            // check if the fifo is empty, if not then read til it is empty
+            while(!get_word(rdout, EMPTY))
+                (void) get_word(rdout, FIFO);
 
             // send rdout done magic
             put_word(rdout, RDOUT_DONE, RDOUT_DONE_MAGIC);
