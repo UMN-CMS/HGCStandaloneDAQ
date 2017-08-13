@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [[ ":$LD_LIBRARY_PATH:" == *":/opt/cactus/lib:"* ]] || [[ ":$PATH:" == *":/opt/cactus/bin/:"* ]]
+then
+    # The path is properly set so we do nothing
+    :
+else
+    export LD_LIBRARY_PATH=/opt/cactus/lib:$(pwd)/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/cactus/bin:$PATH
+fi
+
+./bin/daq 0 1000

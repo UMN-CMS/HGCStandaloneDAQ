@@ -7,11 +7,19 @@
 #include <fstream>
 #include <map>
 
-#define MAXEVENTS 100
-
 
 
 int main(int argc, char *argv[]) {
+
+    /*** argument processing ***/
+    if(argc != 3) {
+        fprintf(stderr, "Proper usage: ./bin/daq [RUN NUMBER] [NUMBER OF EVENTS]\n");
+        exit(1);
+    }
+    const int RUNNUMBER = atoi(argv[1]);
+    const int MAXEVENTS = atoi(argv[2]);
+    printf("Beginning run number %i with %i events\n", RUNNUMBER, MAXEVENTS);
+
 
     /*** initialization ***/
     uhal::setLogLevelTo(uhal::Error());// otherwise there's a bunch of crap printed out
@@ -35,7 +43,7 @@ int main(int argc, char *argv[]) {
     i = 0;
     for(auto& rdout : rdouts) {
         char fname[50];
-        sprintf(fname, "test_RDOUT%i.raw", i);
+        sprintf(fname, "../data/test_RUN%i_RDOUT%i.raw", RUNNUMBER, i);
 
         // pass pointer to map otherwise it won't work.
         // also have to use the HwInterface's id here because they don't like to be put in maps
@@ -51,9 +59,9 @@ int main(int argc, char *argv[]) {
         uint32_t const1 = get_word(rdout, CONSTANT1);
 
         if( (const0 != CONSTANT0_VAL) || (const1 != CONSTANT1_VAL) ) {
-            printf("Constants do not match. Expected ");
-            printf("%8x %8x, got ", CONSTANT0_VAL, CONSTANT1_VAL);
-            printf("%8x %8x instead.\n", const0, const1);
+            fprintf(stderr, "Constants do not match. Expected ");
+            fprintf(stderr, "%8x %8x, got ", CONSTANT0_VAL, CONSTANT1_VAL);
+            fprintf(stderr, "%8x %8x instead.\n", const0, const1);
             exit(1);
         }
     }
@@ -71,6 +79,8 @@ int main(int argc, char *argv[]) {
 
             // get the event data
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
+
+            // TODO check the data
 
             // write the event data to a separate file for each rdout board
             write_data(*file_map[rdout.id()], ev_data);
