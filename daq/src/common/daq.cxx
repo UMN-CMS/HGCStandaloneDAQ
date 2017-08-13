@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <cstdio>
 #include <fstream>
+#include <map>
 
 #define MAXEVENTS 100
 
@@ -16,9 +16,12 @@ int main(int argc, char *argv[]) {
     /*** initialization ***/
     uhal::setLogLevelTo(uhal::Error());// otherwise there's a bunch of crap printed out
 
+    // iterators
     int event, i;
+
+    // containers
     std::vector<uhal::HwInterface> rdouts;
-    std::map<uhal::HwInterface, std::ofstream> file_map;
+    std::map<std::string, std::ofstream*> file_map;// get file from the id of each HwInterface
 
 
     /*** set up connections ***/
@@ -27,13 +30,17 @@ int main(int argc, char *argv[]) {
     for(auto id : ids)
         rdouts.push_back(manager.getDevice(id));
 
-
+    
     /*** set up data files ***/
+    i = 0;
     for(auto& rdout : rdouts) {
-        std::string fname = std::string("test_RDOUT") + std::string(i) + std::string(".raw");
-        std::cout << fname << std::endl;
-        // std::ofstream fout(fname, std::ofstream::binary);
-        // file_map.insert(std::make_pair(rdout, fout));
+        char fname[50];
+        sprintf(fname, "test_RDOUT%i.raw", i);
+
+        // pass pointer to map otherwise it won't work.
+        // also have to use the HwInterface's id here because they don't like to be put in maps
+        file_map[rdout.id()] = new std::ofstream(fname, std::ofstream::binary);
+
         i++;
     }
 
@@ -44,9 +51,9 @@ int main(int argc, char *argv[]) {
         uint32_t const1 = get_word(rdout, CONSTANT1);
 
         if( (const0 != CONSTANT0_VAL) || (const1 != CONSTANT1_VAL) ) {
-            std::cout << "Constants do not match. Expected ";
-            std::cout << std::hex << CONSTANT0_VAL << " " << CONSTANT1_VAL << ", got ";
-            std::cout << std::hex << const0 << " " << const1 << " instead.\n";
+            printf("Constants do not match. Expected ");
+            printf("%8x %8x, got ", CONSTANT0_VAL, CONSTANT1_VAL);
+            printf("%8x %8x instead.\n", const0, const1);
             exit(1);
         }
     }
@@ -65,8 +72,8 @@ int main(int argc, char *argv[]) {
             // get the event data
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
 
-            // TODO write the event data to a separate file for each rdout board - use a map?
-            // write_data(fout, ev_data);
+            // write the event data to a separate file for each rdout board
+            write_data(*file_map[rdout.id()], ev_data);
 
             // check if the fifo is empty, if not then read til it is empty
             while(!get_word(rdout, EMPTY)) {
@@ -82,9 +89,13 @@ int main(int argc, char *argv[]) {
 
 
     /*** closing ***/
-    fout.close();
 
-    // maybe use multiple threads?
+    // close files
+    for(auto& rdout : rdouts) {
+        file_map[rdout.id()]->close();
+    }
+
+    // TODO maybe use multiple threads?
 
     return 0;
 }
