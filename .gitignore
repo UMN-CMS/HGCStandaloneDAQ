@@ -1,3 +1,4 @@
 daq/bin/*
 daq/lib/*
 daq/obj/*
+**/*.raw
