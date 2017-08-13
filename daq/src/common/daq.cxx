@@ -9,20 +9,16 @@
 
 #define MAXEVENTS 100
 
-void print_ev_data(int event, std::vector<uint32_t> data) {
-    std::cout << "EVENT " << event << std::endl;
-    for(auto dat : data) std::cout << std::hex << dat << std::endl;
-    std::cout << std::endl;
-}
+
 
 int main(int argc, char *argv[]) {
 
     /*** initialization ***/
     uhal::setLogLevelTo(uhal::Error());// otherwise there's a bunch of crap printed out
 
-    int event;
+    int event, i;
     std::vector<uhal::HwInterface> rdouts;
-    std::ofstream fout("test.raw", std::ofstream::binary);
+    std::map<uhal::HwInterface, std::ofstream> file_map;
 
 
     /*** set up connections ***/
@@ -30,6 +26,16 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> ids = manager.getDevices(".*rdout.*");// get all rdout boards
     for(auto id : ids)
         rdouts.push_back(manager.getDevice(id));
+
+
+    /*** set up data files ***/
+    for(auto& rdout : rdouts) {
+        std::string fname = std::string("test_RDOUT") + std::string(i) + std::string(".raw");
+        std::cout << fname << std::endl;
+        // std::ofstream fout(fname, std::ofstream::binary);
+        // file_map.insert(std::make_pair(rdout, fout));
+        i++;
+    }
 
 
     /*** test connections ***/
@@ -42,7 +48,7 @@ int main(int argc, char *argv[]) {
             std::cout << std::hex << CONSTANT0_VAL << " " << CONSTANT1_VAL << ", got ";
             std::cout << std::hex << const0 << " " << const1 << " instead.\n";
             exit(1);
-        }          
+        }
     }
 
 
@@ -59,8 +65,8 @@ int main(int argc, char *argv[]) {
             // get the event data
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
 
-            // TODO write the event data
-            write_data(fout, ev_data);
+            // TODO write the event data to a separate file for each rdout board - use a map?
+            // write_data(fout, ev_data);
 
             // check if the fifo is empty, if not then read til it is empty
             while(!get_word(rdout, EMPTY)) {
