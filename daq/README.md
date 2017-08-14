@@ -1,8 +1,4 @@
-# HGCStandaloneDAQ
-A standalone DAQ for HGCal
-
-
-## HGCStandaloneDAQ/daq
+# HGCStandaloneDAQ/daq
 Contains the DAQ source files.
 
 The DAQ can be compiled by running `make` in this folder. Before starting a run, the environment must be set by using `source etc/env.sh`.
