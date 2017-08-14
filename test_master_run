@@ -1,0 +1,98 @@
+#!/bin/bash
+# Test script for a master run (copy files, run sw/update fw on pis, run daq)
+
+
+
+#################### STARTUP ####################
+REPODIR="$(pwd)"                # Get current working directory
+if [ ! -d "$REPODIR/.git/" ]    # Make sure it's the highest directory in the repo
+then
+    echo "You are not in the right directory. This script must be executed from"\
+        "the main directory of the repository."
+    exit
+fi
+
+
+
+#################### FILE COPY ####################
+# Variables
+RDOUTDIR="$REPODIR/rdout/"                  # Folder containing software for RDOUT Pis
+SYNCDIR="$REPODIR/sync/"                    # Folder containing software for SYNC Pis
+REMOTE_RDOUTDIR="~/rdout/"                  # Folder on Pi to contain RDOUT software
+REMOTE_SYNCDIR="~/sync/"                    # Folder on Pi to contain SYNC software
+
+REMOTE_USR="pi"                             # User on the raspberry Pis
+
+RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  # File containing IP's for the readout Pis
+SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    # File containing IP's for the syncboard Pis
+
+RSYNC_FLAGS="-az --delete"                  # Flags used with rsync
+                                            # (archive/recursive, compress, delete removed files)
+
+RDOUT_IPS=($(cat $RDOUT_IP_FILE))           # Read IP's into arrays
+SYNC_IPS=($(cat $SYNC_IP_FILE))
+
+
+# Read file and transfer data
+echo "Beginning file copy process"
+for IP in "${RDOUT_IPS[@]}"
+do
+    echo "Copying $RDOUTDIR to $IP:$REMOTE_RDOUTDIR"
+    rsync $RSYNC_FLAGS $RDOUTDIR $REMOTE_USR@$IP:$REMOTE_RDOUTDIR >> /dev/null
+
+    # If something goes wrong, let the user know and exit
+    if [ $? -ne 0 ]
+    then
+        echo "rsync with" $IP "failed. Aborting."
+        exit 1
+    fi
+done
+
+for IP in "${SYNC_IPS[@]}"
+do
+    echo "Copying $SYNCDIR to $IP:$REMOTE_SYNCDIR"
+    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:$REMOTE_SYNCDIR >> /dev/null
+
+    if [ $? -ne 0 ]
+    then
+        echo "rsync with" $IP "failed. Aborting"
+        exit 1
+    fi
+done
+echo "File copying complete"
+
+
+
+### DAQ ###
+echo "Starting DAQ"
+DAQDIR="$REPODIR/daq/"
+cd $DAQDIR
+
+
+# Check if the user has LD_LIBRARY_PATH and PATH set correctly. If not, it adds the relevant folders.
+if [[ ":$LD_LIBRARY_PATH:" == *":/opt/cactus/lib:"* ]] || [[ ":$PATH:" == *":/opt/cactus/bin/:"* ]]
+then
+    # The path is properly set so we do nothing
+    :
+else
+    # This is also found in daq/etc/env.sh
+    export LD_LIBRARY_PATH=/opt/cactus/lib:$DAQDIR/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/cactus/bin:$PATH
+fi
+
+
+# Make the DAQ and check if make succeeded. If not, quit and inform the user.
+make >> /dev/null
+if [ $? -ne 0 ]
+then
+    echo "The DAQ failed to compile! Aborting run."
+fi
+
+
+# Run the DAQ!
+./bin/main 0 1000
+
+
+
+cd $REPODIR
+exit
