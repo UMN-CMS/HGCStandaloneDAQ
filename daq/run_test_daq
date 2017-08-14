@@ -1,12 +1,28 @@
 #!/bin/bash
 
+
+# Check if the user has LD_LIBRARY_PATH and PATH set correctly. If not, it adds the relevant folders.
 if [[ ":$LD_LIBRARY_PATH:" == *":/opt/cactus/lib:"* ]] || [[ ":$PATH:" == *":/opt/cactus/bin/:"* ]]
 then
     # The path is properly set so we do nothing
     :
 else
+    # This is also found in etc/env.sh
     export LD_LIBRARY_PATH=/opt/cactus/lib:$(pwd)/lib:$LD_LIBRARY_PATH
     export PATH=/opt/cactus/bin:$PATH
 fi
 
-./bin/daq 0 1000
+
+# Make the DAQ and check if make succeeded. If not, quit and inform the user.
+make >> /dev/null
+if [ $? -ne 0 ]
+then
+    echo "The DAQ failed to compile! Aborting run."
+fi
+
+
+# Run the DAQ!
+./bin/main 0 1000
+
+
+exit
