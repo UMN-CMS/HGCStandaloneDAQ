@@ -4,6 +4,19 @@
 
 
 #################### STARTUP ####################
+if [ "$#" -eq 2 ] # Make sure there are zero or two arguments
+then
+    RUN_NUMBER="$1"
+    MAXEVENTS="$2"
+elif [ "$#" -eq 0 ]
+then
+    RUN_NUMBER="0"
+    MAXEVENTS="1000"
+else
+    echo "Usage: ./test_master_run [RUN NUMBER] [EVENTS]"
+    exit
+fi
+
 REPODIR="$(pwd)"                # Get current working directory
 if [ ! -d "$REPODIR/.git/" ]    # Make sure it's the highest directory in the repo
 then
@@ -14,25 +27,29 @@ fi
 
 
 
-#################### FILE COPY ####################
-# Variables
+#################### VARIABLES ####################
+# Directories
+DAQDIR="$REPODIR/daq/"
 RDOUTDIR="$REPODIR/rdout/"                  # Folder containing software for RDOUT Pis
 SYNCDIR="$REPODIR/sync/"                    # Folder containing software for SYNC Pis
 REMOTE_RDOUTDIR="~/rdout/"                  # Folder on Pi to contain RDOUT software
 REMOTE_SYNCDIR="~/sync/"                    # Folder on Pi to contain SYNC software
 
-REMOTE_USR="pi"                             # User on the raspberry Pis
-
+# Files
 RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  # File containing IP's for the readout Pis
 SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    # File containing IP's for the syncboard Pis
 
+# Arrays
+RDOUT_IPS=($(cat $RDOUT_IP_FILE))           # Read rdout IPs into an array
+SYNC_IPS=($(cat $SYNC_IP_FILE))             # Read sync IPs into an array
+
+# Other
+REMOTE_USR="pi"                             # User on the raspberry Pis
 RSYNC_FLAGS="-az --delete"                  # Flags used with rsync
                                             # (archive/recursive, compress, delete removed files)
 
-RDOUT_IPS=($(cat $RDOUT_IP_FILE))           # Read IP's into arrays
-SYNC_IPS=($(cat $SYNC_IP_FILE))
 
-
+#################### FILE COPY ####################
 # Read file and transfer data
 echo "Beginning file copy process"
 for IP in "${RDOUT_IPS[@]}"
@@ -43,7 +60,7 @@ do
     # If something goes wrong, let the user know and exit
     if [ $? -ne 0 ]
     then
-        echo "rsync with" $IP "failed. Aborting."
+        echo "rsync with" $IP "failed - aborting."
         exit 1
     fi
 done
@@ -55,7 +72,7 @@ do
 
     if [ $? -ne 0 ]
     then
-        echo "rsync with" $IP "failed. Aborting"
+        echo "rsync with" $IP "failed - aborting"
         exit 1
     fi
 done
@@ -63,9 +80,8 @@ echo "File copying complete"
 
 
 
-### DAQ ###
+#################### DAQ ####################
 echo "Starting DAQ"
-DAQDIR="$REPODIR/daq/"
 cd $DAQDIR
 
 
@@ -90,7 +106,7 @@ fi
 
 
 # Run the DAQ!
-./bin/main 0 1000
+./bin/main $RUN_NUMBER $MAXEVENTS
 
 
 
