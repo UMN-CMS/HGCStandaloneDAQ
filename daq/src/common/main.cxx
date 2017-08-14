@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <fstream>
 #include <map>
+#include <ctime>
 
 
 
@@ -40,10 +41,17 @@ int main(int argc, char *argv[]) {
 
     
     /*** set up data files ***/
+    
+    // create time stamp
+    std::time_t t = std::time(nullptr);
+    char time_str[50];
+    strftime(time_str, sizeof(time_str), "%d%m%Y_%H%M%S", std::localtime(&t));
+  
+    // make files for each readout board 
     i = 0;
     for(auto& rdout : rdouts) {
         char fname[50];
-        sprintf(fname, "../data/test_RUN%i_RDOUT%i.raw", RUNNUMBER, i);
+        sprintf(fname, "../data/RUN%i_%s_RDOUT%i.raw", RUNNUMBER, time_str, i);
 
         // pass pointer to map otherwise it won't work.
         // also have to use the HwInterface's id here because they don't like to be put in maps
