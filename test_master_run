@@ -36,6 +36,7 @@ REMOTE_RDOUTDIR="~/rdout/"                  # Folder on Pi to contain RDOUT soft
 REMOTE_SYNCDIR="~/sync/"                    # Folder on Pi to contain SYNC software
 
 # Files
+DAQEXE="$DAQDIR/bin/main"                   # DAQ executable
 RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  # File containing IP's for the readout Pis
 SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    # File containing IP's for the syncboard Pis
 
@@ -106,7 +107,7 @@ fi
 
 
 # Run the DAQ!
-./bin/main $RUN_NUMBER $MAXEVENTS
+$DAQEXE $RUN_NUMBER $MAXEVENTS
 
 
 

@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 
     /*** argument processing ***/
     if(argc != 3) {
-        fprintf(stderr, "Proper usage: ./bin/daq [RUN NUMBER] [NUMBER OF EVENTS]\n");
+        fprintf(stderr, "Proper usage: ./bin/main [RUN NUMBER] [NUMBER OF EVENTS]\n");
         exit(1);
     }
     const int RUNNUMBER = atoi(argv[1]);
