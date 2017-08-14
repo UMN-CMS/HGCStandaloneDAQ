@@ -89,6 +89,10 @@ int main(int argc, char *argv[]) {
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
 
             // TODO check the data
+            if(!verify_data(ev_data)) {
+                fprintf(stderr, "Data verification failed. Stopping run.\n");
+                exit(1);
+            }
 
             // write the event data to a separate file for each rdout board
             write_data(*file_map[rdout.id()], ev_data);

@@ -10,4 +10,11 @@ void write_data(std::ofstream& fout, std::vector<uint32_t> data) {
     fout.flush();
 }
 
+
+// verifies the data by checking CRC, etc...
+bool verify_data(std::vector<uint32_t> data) {
+    // TODO
+    return true;
+}
+
 #endif

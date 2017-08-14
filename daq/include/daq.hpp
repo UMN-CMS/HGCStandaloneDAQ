@@ -11,4 +11,7 @@
 // writes a vector of uint32_t's to an ofstream
 void write_data(std::ofstream&, std::vector<uint32_t>);
 
+// verifies the data by checking CRC, etc...
+bool verify_data(std::vector<uint32_t>);
+
 #endif
