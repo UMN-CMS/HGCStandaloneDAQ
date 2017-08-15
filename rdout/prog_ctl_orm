@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+### Directories ###
+FW_DIR="fw"
+BIN_DIR="bin"
+
+### Files ###
+PROG_EXE="$BIN_DIR/ProgramFPGA"
+CTL_FW="$FW_DIR/ctl_orm_rst.hex"
+
+### CTL ORM ###
+sudo $PROG_EXE 4 < $CTL_FW

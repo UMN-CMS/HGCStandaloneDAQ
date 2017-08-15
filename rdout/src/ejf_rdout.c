@@ -1,39 +1,6 @@
 #include "ejf_rdout.h"
 #include "ctl_orm.h"
 
-int power_cycle_just_fpgas()
-{
-  char PAGE[1];
-  char GPIO_PIN;
-  GPIO_PIN = 6;
-  
-  // Time to power cycle the FPGAs
-  bcm2835_spi_chipSelect(BCM2835_SPI_CS0);	// CS0
-  
-  PAGE[0] = 0xF;
-  bcm2835_spi_writenb(PAGE, sizeof(PAGE));
-  bcm2835_spi_chipSelect(BCM2835_SPI_CS1);	// CS1
-  
-  // Clearing Pin
-  char PIN_SELECT = 0xFF ^ (1 << GPIO_PIN);
-  char PIN_as_output[] = {0x40, 0x01, PIN_SELECT};	// Want PIN to be an output
-  bcm2835_spi_writenb(PIN_as_output, sizeof(PIN_as_output)+1);
-
-  char PIN_high[] = {0x40, 0x13, (1 << GPIO_PIN)};	// Set PIN to output high
-  bcm2835_spi_writenb(PIN_high, sizeof(PIN_high)+1);
-  sleep(5);						// Wait!
-
-  char PIN_low[] = {0x40, 0x13, PIN_SELECT};		// Set PIN to output low
-  bcm2835_spi_writenb(PIN_low, sizeof(PIN_high)+1);
-  sleep(15);						// Wait!
-
-  char PIN_as_input[] = {0x40, 0x01, 0xFF};		// Set PIN as input again
-  bcm2835_spi_writenb(PIN_as_input, sizeof(PIN_as_input)+1);
-  
-  return 0;
-}
-
-
 int power_cycle(int orm)
 {
   char PAGE[1];
@@ -146,7 +113,7 @@ int decode_raw()
   /*    Gray to binary conversion                      */
   /*****************************************************/
   for(k = 0; k < 4 ; k = k +1 ){
-    for(i = 0; i < 128*15; i = i + 1){
+    for(i = 0; i < 128*13; i = i + 1){
       bith = ev[k][i] & 0x8000;
       t = ev[k][i] & 0x7fff;
       bit11 = (t >> 11) & 1;
@@ -172,7 +139,7 @@ int format_channels()
   int chip, ch, hit; 
   for (chip = 0; chip < 4; chip = chip +1 ){
     for (ch = 0; ch < 128; ch = ch +1 ){
-      for (hit = 0 ; hit <15 ; hit = hit +1){
+      for (hit = 0 ; hit <13 ; hit = hit +1){
 	data[chip][ch][hit] = ev[chip][hit*128+ch] & 0x0FFF;
       }
     }

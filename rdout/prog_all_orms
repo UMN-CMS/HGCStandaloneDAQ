@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+### Directories ###
+FW_DIR="fw"
+BIN_DIR="bin"
+
+### Files ###
+PROG_EXE="$BIN_DIR/ProgramFPGA"
+DATA_FW="$FW_DIR/data_orm1.hex"
+CTL_FW="$FW_DIR/ctl_orm_rst.hex"
+
+### Data ORMs ###
+for ORM in ( 0 1 2 3 )
+do
+    sudo $PROG_EXE $ORM < $DATA_FW
+done
+
+### CTL ORM ###
+sudo $PROG_EXE 4 < $CTL_FW
