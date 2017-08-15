@@ -39,8 +39,8 @@ REMOTE_SYNCDIR="~/sync/"                    # Folder on Pi to contain SYNC softw
 DAQEXE="$DAQDIR/bin/main"                   # DAQ executable
 RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  # File containing IP's for the readout Pis
 SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    # File containing IP's for the syncboard Pis
-REMOTE_RDOUT_EXE="test"    # File to be executed on rdout Pis
-REMOTE_SYNC_EXE="test"      # File to be executed on sync Pis
+REMOTE_RDOUT_EXE="run_rdout"                # File to be executed on rdout Pis
+REMOTE_SYNC_EXE="run_sync"                  # File to be executed on sync Pis
 
 # Arrays
 RDOUT_IPS=($(cat $RDOUT_IP_FILE))           # Read rdout IPs into an array
@@ -122,7 +122,7 @@ fi
 
 
 # Run the DAQ!
-$DAQEXE $RUN_NUMBER $MAXEVENTS
+# $DAQEXE $RUN_NUMBER $MAXEVENTS
 
 
 

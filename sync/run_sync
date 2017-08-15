@@ -1,0 +1,45 @@
+#!/bin/bash
+PED=0
+
+
+
+#################### Variables ####################
+SYNC_NAME="sync_debug"
+
+# Directories
+SYNCDIR="$PWD"
+BINDIR="$SYNCDIR/bin"
+SRCDIR="$SYNCDIR/src"
+FWDIR="$SYNCDIR/fw"
+
+# Executables
+PROGEXE="$BINDIR/ProgramFPGA"
+SYNCEXE="$BINDIR/$SYNC_NAME"
+TRIGEXE="$BINDIR/enable_triggers"
+TRIGSTATUS="$BINDIR/get_trigger_enabled"
+
+# Firmware Files
+SYNC_FW="$FWDIR/sync_orm1.hex"
+CTL_FW="$FWDIR/ctl1.hex"
+
+# ORMs
+SYNC_ORM=4
+CTL_ORM=4
+
+
+
+#################### FW INSTALL ####################
+# Sync ORM
+$PROGEXE $SYNC_ORM < $SYNC_FW
+# TODO CHECK SUCCESS
+
+
+
+#################### RUN SYNC ####################
+# Compile (using the compile script)
+$COMPILE
+# TODO CHECK SUCCESS
+
+# Run
+sudo $SYNCEXE $PED
+pgrep $SYNC_NAME

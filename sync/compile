@@ -1,0 +1,7 @@
+#!/bin/bash
+
+gcc -O src/sync_debug.c src/sync_orm.c src/spi_common.c -l bcm2835 -o bin/sync_debug
+
+gcc -O src/enable_triggers.c src/sync_orm.c src/spi_common.c -l bcm2835 -o bin/enable_triggers
+
+gcc -O src/get_trigger_enabled.c src/sync_orm.c src/spi_common.c -l bcm2835 -o bin/get_trigger_enabled

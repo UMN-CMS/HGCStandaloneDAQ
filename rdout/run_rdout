@@ -1,5 +1,8 @@
 #!/bin/bash
 
+RUNNUM=0
+EVENTS=1
+PED=0
 
 
 #################### Variables ####################
@@ -46,10 +49,9 @@ echo "$?"
 
 #################### RUN RDOUT ####################
 # Compile (using the compile script)
-$COMPILE &> /dev/null
+$COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-echo $RDOUTEXE
-#sudo $RDOUTEXE
+sudo $RDOUTEXE $RUNNUM $EVENTS $PED
 pgrep $RDOUT_NAME
