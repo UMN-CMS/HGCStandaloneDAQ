@@ -1,0 +1,55 @@
+#!/bin/bash
+
+
+
+#################### Variables ####################
+RDOUT_NAME="new_rdout"
+
+# Directories
+RDOUTDIR="$PWD"
+BINDIR="$RDOUTDIR/bin"
+SRCDIR="$RDOUTDIR/src"
+FWDIR="$RDOUTDIR/fw"
+
+# Executables
+PROGEXE="$BINDIR/ProgramFPGA"
+RDOUTEXE="$BINDIR/$RDOUT_NAME"
+SLEEPEXE="$BINDIR/take_a_nap"
+PWREXE="$BINDIR/pwr_cycle_fpgas"
+COMPILE="$RDOUTDIR/compile"
+
+# Firmware Files
+DATA_FW="$FWDIR/data_orm1.hex"
+CTL_FW="$FWDIR/ctl_orm_rst.hex"
+
+# ORM Arrays
+DATA_ORMS=( 0 1 2 3 )
+CTL_ORM=4
+
+
+
+#################### FW INSTALL ####################
+# Data ORMs
+for ORM in "${DATA_ORMS[@]}"
+do
+    #sudo $PROGEXE $ORM < $DATA_FW >> /dev/null
+    echo "$?"
+    # TODO CHECK SUCCESS
+done
+
+# CTL ORM
+#sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null
+echo "$?"
+# TODO CHECK SUCCESS
+
+
+
+#################### RUN RDOUT ####################
+# Compile (using the compile script)
+$COMPILE &> /dev/null
+# TODO CHECK SUCCESS
+
+# Run
+echo $RDOUTEXE
+#sudo $RDOUTEXE
+pgrep $RDOUT_NAME

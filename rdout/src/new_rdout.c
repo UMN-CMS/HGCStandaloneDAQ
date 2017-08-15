@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
 
 	int maxevents = 1000;
 	char instr [1024];
-	FILE *fraw;
-	FILE *fout;
-	FILE *ftrig;// for trigger info
+	//FILE *fraw;
+	//FILE *fout;
+	//FILE *ftrig;// for trigger info
 
 	int hx;
 	int junk[2000];
@@ -70,21 +70,21 @@ int main(int argc, char *argv[])
 		return(0);
 	}
 
-	runid = atoi(argv[1]);
-	maxevents = atoi(argv[2]);
-	PED = atoi(argv[3]);
+	//runid = atoi(argv[1]);
+	//maxevents = atoi(argv[2]);
+	//PED = atoi(argv[3]);
 
 	char runNum[8];
 	sprintf (runNum, "RUN_%04d", runid);
 	if(PED) sprintf(runNum, "PED_RUN_%04d", runid);
 
-	FILE *fid;
+	/*FILE *fid;
 	if ((fid=fopen("BoardID","r")) == NULL) {fprintf(stderr,"ERROR: BoardID file not found.\n"); exit(-1);}
 	char id[2] = {0};
 	id[0] = fgetc(fid);
 	int board_id = atoi(id);
 	char boardID_str[20]; sprintf(boardID_str, "_RDOUT%i", board_id);
-	fclose(fid);
+	fclose(fid);*/
 
 	saveraw = true;
 
@@ -98,35 +98,35 @@ int main(int argc, char *argv[])
 	strcpy(fname, dirname);
 	strcat(fname, runNum);
 	strcat(fname, buffer);
-	strcat(fname, boardID_str);
+	//strcat(fname, boardID_str);
 	strcat(fname,".txt");
 	fprintf(stderr,"Filename will be %s\n",fname);
 
-	fout = fopen(fname, "w");
-	fprintf(fout,"\nTotal number of events: %d",maxevents);
-	fprintf(fout,"\n%s\n##########################################\n",buffer);
+	//fout = fopen(fname, "w");
+	//fprintf(fout,"\nTotal number of events: %d",maxevents);
+	//fprintf(fout,"\n%s\n##########################################\n",buffer);
 
 	// optional save raw data
 	strcpy(fname, dirname);
 	strcat(fname, runNum);
 	strcat(fname, buffer);
-	strcat(fname, boardID_str);
+	//strcat(fname, boardID_str);
 	strcat(fname,".raw");
 	fprintf(stderr,"Raw filename will be %s\n",fname);
 
-	fraw = fopen(fname, "w");
-	if ((fraw=fopen(fname,"w")) == NULL) {fprintf(stderr,"ERROR: fopen failed.\n"); exit(-1);}
+	//fraw = fopen(fname, "w");
+	//if ((fraw=fopen(fname,"w")) == NULL) {fprintf(stderr,"ERROR: fopen failed.\n"); exit(-1);}
 
 	// save text data
 	strcpy(fname, dirname);
 	strcat(fname, runNum);
 	strcat(fname, buffer);
 	strcat(fname, "_TIMING");
-	strcat(fname, boardID_str);
+	//strcat(fname, boardID_str);
 	strcat(fname, ".txt");
 	fprintf(stderr, "Trigger timing file will be %s\n", fname);
-	ftrig = fopen(fname, "w");
-	fprintf(ftrig, "TrigNumber TrigCount TimeStamp TimeDiff\n");
+	//ftrig = fopen(fname, "w");
+	//fprintf(ftrig, "TrigNumber TrigCount TimeStamp TimeDiff\n");
 
 	// Startup the SPI interface on the Pi.
 	init_spi();
@@ -330,9 +330,10 @@ int main(int argc, char *argv[])
 	// Send a pulse back to the SYNC board. Give us a trigger.
 	CTL_put_done();
 
-	for(i = 0; i < maxevents; i = i + 1) {
+	//for(i = 0; i < maxevents; i = i + 1) {
+    while(1) {
 
-		if( !(i % 10) && (access( "stop.run.please", R_OK ) != -1) ) break;// exit if file is created     
+		//if( !(i % 10) && (access( "stop.run.please", R_OK ) != -1) ) break;// exit if file is created     
 
 		// Get hexaboards ready.
 		for(hexbd = 0; hexbd < MAXHEXBDS; hexbd++) {
@@ -494,9 +495,9 @@ int main(int argc, char *argv[])
 		//    if (saveraw) fwrite(raw_32bit_new, 1, sizeof(raw_32bit_new), fraw);
 	}// event loop
 
-	fclose(fout);
-	fclose(fraw);
-	fclose(ftrig);
+	//fclose(fout);
+	//fclose(fraw);
+	//fclose(ftrig);
 	end_spi();
 	return(0);    
 
