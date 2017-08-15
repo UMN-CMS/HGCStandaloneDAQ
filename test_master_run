@@ -4,14 +4,16 @@
 
 
 #################### STARTUP ####################
-if [ "$#" -eq 2 ] # Make sure there are zero or two arguments
+if [ "$#" -eq 3 ] # Make sure there are zero or two arguments
 then
-    RUN_NUMBER="$1"
-    MAXEVENTS="$2"
+    RUN_NUMBER=$1
+    MAXEVENTS=$2
+    PED=$3
 elif [ "$#" -eq 0 ]
 then
-    RUN_NUMBER="0"
-    MAXEVENTS="1000"
+    RUN_NUMBER=0
+    MAXEVENTS=1000
+    PED=0
 else
     echo "Usage: ./test_master_run [RUN NUMBER] [EVENTS]"
     exit
@@ -29,9 +31,10 @@ fi
 
 #################### VARIABLES ####################
 # Directories
-DAQDIR="$REPODIR/daq/"
+DAQDIR="$REPODIR/daq/"                      # Folder containing DAQ software
 RDOUTDIR="$REPODIR/rdout/"                  # Folder containing software for RDOUT Pis
 SYNCDIR="$REPODIR/sync/"                    # Folder containing software for SYNC Pis
+DATADIR="$REPODIR/data/"                    # Folder for the data files
 REMOTE_RDOUTDIR="~/rdout/"                  # Folder on Pi to contain RDOUT software
 REMOTE_SYNCDIR="~/sync/"                    # Folder on Pi to contain SYNC software
 
@@ -48,8 +51,10 @@ SYNC_IPS=($(cat $SYNC_IP_FILE))             # Read sync IPs into an array
 
 # Other
 REMOTE_USR="pi"                             # User on the raspberry Pis
-RSYNC_FLAGS="-az --delete"                  # Flags used with rsync
-                                            # (archive/recursive, compress, delete removed files)
+RSYNC_FLAGS="-az --delete"                  # Flags used with rsync (archive/recursive, compress, delete removed files)
+RDOUT_ARGS="$RUN_NUMBER $MAXEVENTS $PED"    # Arguments fed to the readout script
+SYNC_ARGS="$PED"                            # Arguments fed to the sync script
+DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $PED"      # Arguments fed to the DAQ
 
 
 #################### FILE COPY ####################
@@ -86,12 +91,12 @@ echo "File copying complete"
 #################### FW INSTALL, SW EXECUTION ####################
 for IP in "${RDOUT_IPS[@]}"
 do
-    ssh $REMOTE_USR@$IP "cd $REMOTE_RDOUTDIR; ./$REMOTE_RDOUT_EXE"
+    ssh $REMOTE_USR@$IP "cd $REMOTE_RDOUTDIR; ./$REMOTE_RDOUT_EXE $RDOUT_ARGS"
 done
 
 for IP in "${SYNC_IPS[@]}"
 do
-    ssh $REMOTE_USR@$IP "cd $REMOTE_SYNCDIR; ./$REMOTE_SYNC_EXE"
+    ssh $REMOTE_USR@$IP "cd $REMOTE_SYNCDIR; ./$REMOTE_SYNC_EXE $SYNC_ARGS"
 done
 
 
@@ -122,7 +127,7 @@ fi
 
 
 # Run the DAQ!
-# $DAQEXE $RUN_NUMBER $MAXEVENTS
+echo "$DAQEXE $DAQ_ARGS"
 
 
 

@@ -1,8 +1,17 @@
 #!/bin/bash
 
-RUNNUM=0
-EVENTS=1
-PED=0
+
+
+#################### Arguments ####################
+if [ $# -ne 3 ]
+then
+    echo "Incorrect arguments. Should be [RUN NUMBER] [EVENTS] [PEDESTAL]"
+    exit 1
+fi
+RUNNUM=$1
+EVENTS=$2
+PED=$3
+
 
 
 #################### Variables ####################
@@ -29,6 +38,9 @@ CTL_FW="$FWDIR/ctl_orm_rst.hex"
 DATA_ORMS=( 0 1 2 3 )
 CTL_ORM=4
 
+# Other
+RDOUT_ARGS="$RUNNUM $EVENTS $PED"
+
 
 
 #################### FW INSTALL ####################
@@ -53,5 +65,5 @@ $COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-sudo $RDOUTEXE $RUNNUM $EVENTS $PED
+sudo $RDOUTEXE $RDOUT_ARGS
 pgrep $RDOUT_NAME

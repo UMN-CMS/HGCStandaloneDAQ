@@ -5,8 +5,8 @@
 # TODO
 #   Test DAQ w/ real hexaboards
 #   Verify CRC in DAQ
-#   Fill and organize rdout/ directory
-#   Fill and organize sync/ directory
-#   Add master run scripts to the rdout/ and sync/ directories for the Pis to run
-#   Figure out how to run the ssh commands remotely and then kill them when done
+#   Organize rdout/ directory
+#   Organize sync/ directory
+#   Finalize master run scripts to the rdout/ and sync/ directories for the Pis to run
+#   Use pgrep to find sync and rdout processes to be able to kill them
 #   Update master run script with this information

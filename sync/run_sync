@@ -1,5 +1,14 @@
 #!/bin/bash
-PED=0
+
+
+
+#################### Arguments ####################
+if [ $# -ne 1 ]
+then
+    echo "Incorrect arguments. Should be [PEDESTAL]"
+    exit 1
+fi
+PED=$1
 
 
 
@@ -26,6 +35,9 @@ CTL_FW="$FWDIR/ctl1.hex"
 SYNC_ORM=4
 CTL_ORM=4
 
+# Other
+SYNC_ARGS="$PED"
+
 
 
 #################### FW INSTALL ####################
@@ -41,5 +53,5 @@ $COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-sudo $SYNCEXE $PED
+sudo $SYNCEXE $SYNC_ARGS
 pgrep $SYNC_NAME
