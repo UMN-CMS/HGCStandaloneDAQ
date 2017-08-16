@@ -13,25 +13,26 @@
 int main(int argc, char *argv[]) {
 
     /*** argument processing ***/
-    if(argc != 4) {
-        fprintf(stderr, "Proper usage: ./bin/main [RUN NUMBER] [NUMBER OF EVENTS] [DATA DIRECTORY]\n");
+    if(argc != 5) {
+        fprintf(stderr, "Proper usage: ./bin/main [RUN NUMBER] [NUMBER OF EVENTS] [PED] [DATA DIRECTORY]\n");
         exit(1);
     }
     const int RUNNUMBER = atoi(argv[1]);
     const int MAXEVENTS = atoi(argv[2]);
-    const std::string DATADIR = argv[3];
-    printf("Beginning run number %i with %i events\n", RUNNUMBER, MAXEVENTS);
+    const bool PED = atoi(argv[3]);
+    const std::string DATADIR = argv[4];
+    if(PED) printf("Beginning PED run number %i with %i events.\n", RUNNUMBER, MAXEVENTS);
+    else printf("Beginning run number %i with %i events.\n", RUNNUMBER, MAXEVENTS);
 
 
     /*** initialization ***/
     uhal::setLogLevelTo(uhal::Error());// otherwise there's a bunch of crap printed out
 
     // iterators
-    int event, i;
+    int event;
 
     // containers
     std::vector<uhal::HwInterface> rdouts;
-    std::map<std::string, std::ofstream*> file_map;// get file from the id of each HwInterface
 
 
     /*** set up connections ***/
@@ -41,25 +42,21 @@ int main(int argc, char *argv[]) {
         rdouts.push_back(manager.getDevice(id));
 
 
-    /*** set up data files ***/
+    /*** set up data file ***/
     
     // create time stamp
     std::time_t t = std::time(nullptr);
     char time_str[50];
     strftime(time_str, sizeof(time_str), "%d%m%Y_%H%M%S", std::localtime(&t));
   
-    // make files for each readout board 
-    i = 0;
-    for(auto& rdout : rdouts) {
-        char fname[50];
-        sprintf(fname, "%s/RUN%i_%s_RDOUT%i.raw", DATADIR.c_str(), RUNNUMBER, time_str, i);
+    // create filename
+    char fname[50];
+    if(PED) sprintf(fname, "%s/PED_RUN%i_%s.raw", DATADIR.c_str(), RUNNUMBER, time_str);
+    else sprintf(fname, "%s/RUN%i_%s.raw", DATADIR.c_str(), RUNNUMBER, time_str);
 
-        // pass pointer to map otherwise it won't work.
-        // also have to use the HwInterface's id here because they don't like to be put in maps
-        file_map[rdout.id()] = new std::ofstream(fname, std::ofstream::binary);
+    // open file
+    std::ofstream fout(fname, std::ofstream::binary);
 
-        i++;
-    }
 
 
     /*** test connections ***/
@@ -96,7 +93,7 @@ int main(int argc, char *argv[]) {
             }
 
             // write the event data to a separate file for each rdout board
-            write_data(*file_map[rdout.id()], ev_data);
+            write_data(fout, ev_data);
 
             // check if the fifo is empty, if not then read til it is empty
             while(!get_word(rdout, EMPTY)) {
@@ -112,11 +109,8 @@ int main(int argc, char *argv[]) {
 
 
     /*** closing ***/
-
     // close files
-    for(auto& rdout : rdouts) {
-        file_map[rdout.id()]->close();
-    }
+    fout.close();
 
     // TODO maybe use multiple threads?
 

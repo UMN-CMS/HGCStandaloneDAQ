@@ -15,7 +15,7 @@ then
     MAXEVENTS=1000
     PED=0
 else
-    echo "Usage: ./test_master_run [RUN NUMBER] [EVENTS]"
+    echo "Usage: ./test_master_run [RUN NUMBER] [EVENTS] [PED]"
     exit
 fi
 
@@ -31,32 +31,32 @@ fi
 
 #################### VARIABLES ####################
 # Directories
-DAQDIR="$REPODIR/daq"                       # Folder containing DAQ software
-RDOUTDIR="$REPODIR/rdout"                   # Folder containing software for RDOUT Pis
-SYNCDIR="$REPODIR/sync"                     # Folder containing software for SYNC Pis
-DATADIR="$REPODIR/data"                     # Folder for the data files
-REMOTE_RDOUTDIR="~/rdout"                   # Folder on Pi to contain RDOUT software
-REMOTE_SYNCDIR="~/sync"                     # Folder on Pi to contain SYNC software
+DAQDIR="$REPODIR/daq"                       	# Folder containing DAQ software
+RDOUTDIR="$REPODIR/rdout"                   	# Folder containing software for RDOUT Pis
+SYNCDIR="$REPODIR/sync"                     	# Folder containing software for SYNC Pis
+DATADIR="$REPODIR/data"                     	# Folder for the data files
+REMOTE_RDOUTDIR="~/rdout"                   	# Folder on Pi to contain RDOUT software
+REMOTE_SYNCDIR="~/sync"                     	# Folder on Pi to contain SYNC software
 
 # Files
-DAQEXE="$DAQDIR/bin/main"                   # DAQ executable
-RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  # File containing IP's for the readout Pis
-SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    # File containing IP's for the syncboard Pis
-REMOTE_RDOUT_EXE="run_rdout"                # File to be executed on rdout Pis
-REMOTE_SYNC_EXE="run_sync"                  # File to be executed on sync Pis
-ENDRDOUT="$REMOTE_RDOUTDIR/stop.run.please" # When created, this file stops the helper process on the rdout Pis
-ENDSYNC="$REMOTE_SYNCDIR/stop.run.please"   # When created, this file stops the helper process on the sync Pis
+DAQEXE="$DAQDIR/bin/main"                   	# DAQ executable
+RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  	# File containing IP's for the readout Pis
+SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    	# File containing IP's for the syncboard Pis
+REMOTE_RDOUT_EXE="run_rdout"                	# File to be executed on rdout Pis
+REMOTE_SYNC_EXE="run_sync"                  	# File to be executed on sync Pis
+ENDRDOUT="$REMOTE_RDOUTDIR/stop.run.please" 	# When created, this file stops the helper process on the rdout Pis
+ENDSYNC="$REMOTE_SYNCDIR/stop.run.please"   	# When created, this file stops the helper process on the sync Pis
 
 # Arrays
-RDOUT_IPS=($(cat $RDOUT_IP_FILE))           # Read rdout IPs into an array
-SYNC_IPS=($(cat $SYNC_IP_FILE))             # Read sync IPs into an array
+RDOUT_IPS=($(cat $RDOUT_IP_FILE))           	# Read rdout IPs into an array
+SYNC_IPS=($(cat $SYNC_IP_FILE))             	# Read sync IPs into an array
 
 # Other
-REMOTE_USR="pi"                             # User on the raspberry Pis
-RSYNC_FLAGS="-az --delete"                  # Flags used with rsync (archive/recursive, compress, delete removed files)
-RDOUT_ARGS="$RUN_NUMBER $MAXEVENTS $PED"    # Arguments fed to the readout script
-SYNC_ARGS="$PED"                            # Arguments fed to the sync script
-DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $DATADIR"  # Arguments fed to the DAQ
+REMOTE_USR="pi"                                 # User on the raspberry Pis
+RSYNC_FLAGS="-az --delete"                      # Flags used with rsync (archive/recursive, compress, delete removed files)
+RDOUT_ARGS="$RUN_NUMBER $MAXEVENTS $PED"        # Arguments fed to the readout script
+SYNC_ARGS="$PED"                                # Arguments fed to the sync script
+DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $PED $DATADIR" # Arguments fed to the DAQ
 
 
 #################### FILE COPY ####################
