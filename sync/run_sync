@@ -49,6 +49,14 @@ then
     rm $END_FILE
 fi
 
+# Kill any old sync processes
+TMP="$(pgrep $SYNC_NAME)"
+if [ $TMP ]
+then
+    sudo kill $TMP
+fi
+
+
 
 
 #################### FW INSTALL ####################

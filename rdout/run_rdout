@@ -51,6 +51,13 @@ then
     rm $END_FILE
 fi
 
+# Kill any old rdout processes
+TMP="$(pgrep $RDOUT_NAME)"
+if [ $TMP ]
+then
+    sudo kill $TMP
+fi
+
 
 
 #################### FW INSTALL ####################
