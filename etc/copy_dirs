@@ -23,6 +23,7 @@ REPODIR="$PWD"
 # Directories
 RDOUTDIR="$REPODIR/rdout"                   	# Folder containing software for RDOUT Pis
 SYNCDIR="$REPODIR/sync"                     	# Folder containing software for SYNC Pis
+COMMONDIR="$REPODIR/common/"                    # Folder containing software common to RDOUT and SYNC Pis
 REMOTE_RDOUTDIR="~/rdout"                   	# Folder on Pi to contain RDOUT software
 REMOTE_SYNCDIR="~/sync"                     	# Folder on Pi to contain SYNC software
 
@@ -72,7 +73,7 @@ do
         exit 1
     fi
 
-    scp -r $COMMONDIR/* $REMOTE_USR@$IP:$REMOTE_RDOUTDIR >> /dev/null
+    scp -r $COMMONDIR/* $REMOTE_USR@$IP:$REMOTE_SYNCDIR >> /dev/null
     if [ $? -ne 0 ]
     then
         echo "scp with" $IP "failed - aborting"
