@@ -1,0 +1,72 @@
+#!/bin/bash
+# Copies rdout/ and sync/ directories to the Raspberry Pis
+
+
+
+#################### STARTUP ####################
+# Check directory
+CURRDIR="${PWD##*/}"
+if [ "$CURRDIR" == "etc" ]
+then
+    cd ..
+elif [ ! -d ".git" ]
+then
+    echo "You are not in the right directory. Execute this script from"\
+        "the main directory or etc/."
+    exit
+fi
+REPODIR="$PWD"
+
+
+
+#################### VARIABLES ####################
+# Directories
+RDOUTDIR="$REPODIR/rdout"                   	# Folder containing software for RDOUT Pis
+SYNCDIR="$REPODIR/sync"                     	# Folder containing software for SYNC Pis
+REMOTE_RDOUTDIR="~/rdout"                   	# Folder on Pi to contain RDOUT software
+REMOTE_SYNCDIR="~/sync"                     	# Folder on Pi to contain SYNC software
+
+# Files
+RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  	# File containing IP's for the readout Pis
+SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    	# File containing IP's for the syncboard Pis
+
+# Arrays
+RDOUT_IPS=($(cat $RDOUT_IP_FILE))           	# Read rdout IPs into an array
+SYNC_IPS=($(cat $SYNC_IP_FILE))             	# Read sync IPs into an array
+
+# Other
+REMOTE_USR="pi"                                 # User on the raspberry Pis
+RSYNC_FLAGS="-az --delete"                      # Flags used with rsync (archive/recursive, compress, delete removed files)
+
+
+
+#################### FILE COPY ####################
+# Transfer data
+for IP in "${RDOUT_IPS[@]}"
+do
+    echo "Copying $RDOUTDIR to $IP:$REMOTE_RDOUTDIR"
+    rsync $RSYNC_FLAGS $RDOUTDIR $REMOTE_USR@$IP:~/ >> /dev/null
+
+    # If something goes wrong, let the user know and exit
+    if [ $? -ne 0 ]
+    then
+        echo "rsync with" $IP "failed - aborting."
+        exit 1
+    fi
+done
+
+for IP in "${SYNC_IPS[@]}"
+do
+    echo "Copying $SYNCDIR to $IP:$REMOTE_SYNCDIR"
+    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:~/ >> /dev/null
+
+    if [ $? -ne 0 ]
+    then
+        echo "rsync with" $IP "failed - aborting"
+        exit 1
+    fi
+done
+
+
+
+exit
