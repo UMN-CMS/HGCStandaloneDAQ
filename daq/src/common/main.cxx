@@ -13,12 +13,13 @@
 int main(int argc, char *argv[]) {
 
     /*** argument processing ***/
-    if(argc != 3) {
-        fprintf(stderr, "Proper usage: ./bin/main [RUN NUMBER] [NUMBER OF EVENTS]\n");
+    if(argc != 4) {
+        fprintf(stderr, "Proper usage: ./bin/main [RUN NUMBER] [NUMBER OF EVENTS] [DATA DIRECTORY]\n");
         exit(1);
     }
     const int RUNNUMBER = atoi(argv[1]);
     const int MAXEVENTS = atoi(argv[2]);
+    const std::string DATADIR = argv[3];
     printf("Beginning run number %i with %i events\n", RUNNUMBER, MAXEVENTS);
 
 
@@ -39,7 +40,7 @@ int main(int argc, char *argv[]) {
     for(auto id : ids)
         rdouts.push_back(manager.getDevice(id));
 
-    
+
     /*** set up data files ***/
     
     // create time stamp
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]) {
     i = 0;
     for(auto& rdout : rdouts) {
         char fname[50];
-        sprintf(fname, "../data/RUN%i_%s_RDOUT%i.raw", RUNNUMBER, time_str, i);
+        sprintf(fname, "%s/RUN%i_%s_RDOUT%i.raw", DATADIR.c_str(), RUNNUMBER, time_str, i);
 
         // pass pointer to map otherwise it won't work.
         // also have to use the HwInterface's id here because they don't like to be put in maps

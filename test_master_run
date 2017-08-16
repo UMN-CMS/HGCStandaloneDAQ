@@ -54,7 +54,7 @@ REMOTE_USR="pi"                             # User on the raspberry Pis
 RSYNC_FLAGS="-az --delete"                  # Flags used with rsync (archive/recursive, compress, delete removed files)
 RDOUT_ARGS="$RUN_NUMBER $MAXEVENTS $PED"    # Arguments fed to the readout script
 SYNC_ARGS="$PED"                            # Arguments fed to the sync script
-DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $PED"      # Arguments fed to the DAQ
+DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $DATADIR"  # Arguments fed to the DAQ
 
 
 #################### FILE COPY ####################
