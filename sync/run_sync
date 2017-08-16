@@ -26,6 +26,7 @@ PROGEXE="$BINDIR/ProgramFPGA"
 SYNCEXE="$BINDIR/$SYNC_NAME"
 TRIGEXE="$BINDIR/enable_triggers"
 TRIGSTATUS="$BINDIR/get_trigger_enabled"
+COMPILE="$SYNCDIR/compile"
 
 # Firmware Files
 SYNC_FW="$FWDIR/sync_orm1.hex"
@@ -42,7 +43,7 @@ SYNC_ARGS="$PED"
 
 #################### FW INSTALL ####################
 # Sync ORM
-$PROGEXE $SYNC_ORM < $SYNC_FW
+# sudo $PROGEXE $SYNC_ORM < $SYNC_FW
 # TODO CHECK SUCCESS
 
 
@@ -53,5 +54,5 @@ $COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-sudo $SYNCEXE $SYNC_ARGS
-pgrep $SYNC_NAME
+# nohup sudo $SYNCEXE $SYNC_ARGS &> /dev/null &
+# echo "$!" # print out pid of previous command

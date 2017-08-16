@@ -31,12 +31,12 @@ fi
 
 #################### VARIABLES ####################
 # Directories
-DAQDIR="$REPODIR/daq/"                      # Folder containing DAQ software
-RDOUTDIR="$REPODIR/rdout/"                  # Folder containing software for RDOUT Pis
-SYNCDIR="$REPODIR/sync/"                    # Folder containing software for SYNC Pis
-DATADIR="$REPODIR/data/"                    # Folder for the data files
-REMOTE_RDOUTDIR="~/rdout/"                  # Folder on Pi to contain RDOUT software
-REMOTE_SYNCDIR="~/sync/"                    # Folder on Pi to contain SYNC software
+DAQDIR="$REPODIR/daq"                       # Folder containing DAQ software
+RDOUTDIR="$REPODIR/rdout"                   # Folder containing software for RDOUT Pis
+SYNCDIR="$REPODIR/sync"                     # Folder containing software for SYNC Pis
+DATADIR="$REPODIR/data"                     # Folder for the data files
+REMOTE_RDOUTDIR="~/rdout"                   # Folder on Pi to contain RDOUT software
+REMOTE_SYNCDIR="~/sync"                     # Folder on Pi to contain SYNC software
 
 # Files
 DAQEXE="$DAQDIR/bin/main"                   # DAQ executable
@@ -63,7 +63,7 @@ echo "Beginning file copy process"
 for IP in "${RDOUT_IPS[@]}"
 do
     echo "Copying $RDOUTDIR to $IP:$REMOTE_RDOUTDIR"
-    rsync $RSYNC_FLAGS $RDOUTDIR $REMOTE_USR@$IP:$REMOTE_RDOUTDIR >> /dev/null
+    rsync $RSYNC_FLAGS $RDOUTDIR $REMOTE_USR@$IP:~/ >> /dev/null
 
     # If something goes wrong, let the user know and exit
     if [ $? -ne 0 ]
@@ -76,7 +76,7 @@ done
 for IP in "${SYNC_IPS[@]}"
 do
     echo "Copying $SYNCDIR to $IP:$REMOTE_SYNCDIR"
-    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:$REMOTE_SYNCDIR >> /dev/null
+    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:~/ >> /dev/null
 
     if [ $? -ne 0 ]
     then
@@ -89,14 +89,14 @@ echo "File copying complete"
 
 
 #################### FW INSTALL, SW EXECUTION ####################
-for IP in "${RDOUT_IPS[@]}"
-do
-    ssh $REMOTE_USR@$IP "cd $REMOTE_RDOUTDIR; ./$REMOTE_RDOUT_EXE $RDOUT_ARGS"
-done
-
 for IP in "${SYNC_IPS[@]}"
 do
     ssh $REMOTE_USR@$IP "cd $REMOTE_SYNCDIR; ./$REMOTE_SYNC_EXE $SYNC_ARGS"
+done
+
+for IP in "${RDOUT_IPS[@]}"
+do
+    ssh $REMOTE_USR@$IP "cd $REMOTE_RDOUTDIR; ./$REMOTE_RDOUT_EXE $RDOUT_ARGS"
 done
 
 

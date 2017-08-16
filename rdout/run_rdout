@@ -65,5 +65,5 @@ $COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-sudo $RDOUTEXE $RDOUT_ARGS
-pgrep $RDOUT_NAME
+# nohup sudo $RDOUTEXE $RDOUT_ARGS &> /dev/null &
+# echo "$!" # print out pid of previous command
