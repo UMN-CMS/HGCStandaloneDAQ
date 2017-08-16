@@ -7,6 +7,6 @@
 #   Verify CRC in DAQ
 #   Organize rdout/ directory
 #   Organize sync/ directory
+#   Clean up new_rdout.c from the changes made for the stop.run.please method to work
 #   Finalize master run scripts to the rdout/ and sync/ directories for the Pis to run
-#   Use pgrep to find sync and rdout processes to be able to kill them
-#   Update master run script with this information
+#   Finalize main master script
