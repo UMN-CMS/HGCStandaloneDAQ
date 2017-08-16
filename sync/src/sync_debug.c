@@ -3,6 +3,7 @@
 #include "sync_orm.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 
 // RDOUT MASK OPTIONS:
@@ -118,6 +119,7 @@ int main(int argc, char *argv[])
 	i = 0;
 	while(1) {
 		sleep(10); // Sleep 10 seconds.
+		if( access( "stop.run.please", R_OK ) != -1 ) break;// exit if file is created     
 
 		// initialize SPI
 		init_spi();

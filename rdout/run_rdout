@@ -40,6 +40,16 @@ CTL_ORM=4
 
 # Other
 RDOUT_ARGS="$RUNNUM $EVENTS $PED"
+END_FILE="$RDOUTDIR/stop.run.please"
+
+
+
+#################### STARTUP ####################
+# Remove end file so the helper process will run
+if [ -f $END_FILE ]
+then
+    rm $END_FILE
+fi
 
 
 
@@ -47,14 +57,12 @@ RDOUT_ARGS="$RUNNUM $EVENTS $PED"
 # Data ORMs
 for ORM in "${DATA_ORMS[@]}"
 do
-    #sudo $PROGEXE $ORM < $DATA_FW >> /dev/null
-    echo "$?"
+    echo "sudo $PROGEXE $ORM < $DATA_FW >> /dev/null"
     # TODO CHECK SUCCESS
 done
 
 # CTL ORM
-#sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null
-echo "$?"
+echo "sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null"
 # TODO CHECK SUCCESS
 
 
@@ -65,5 +73,4 @@ $COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-# nohup sudo $RDOUTEXE $RDOUT_ARGS &> /dev/null &
-# echo "$!" # print out pid of previous command
+nohup sudo $RDOUTEXE $RDOUT_ARGS &> log.txt &

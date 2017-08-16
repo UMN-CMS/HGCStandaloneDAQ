@@ -44,6 +44,8 @@ RDOUT_IP_FILE="$REPODIR/etc/rdout_ips.txt"  # File containing IP's for the reado
 SYNC_IP_FILE="$REPODIR/etc/sync_ips.txt"    # File containing IP's for the syncboard Pis
 REMOTE_RDOUT_EXE="run_rdout"                # File to be executed on rdout Pis
 REMOTE_SYNC_EXE="run_sync"                  # File to be executed on sync Pis
+ENDRDOUT="$REMOTE_RDOUTDIR/stop.run.please" # When created, this file stops the helper process on the rdout Pis
+ENDSYNC="$REMOTE_SYNCDIR/stop.run.please"   # When created, this file stops the helper process on the sync Pis
 
 # Arrays
 RDOUT_IPS=($(cat $RDOUT_IP_FILE))           # Read rdout IPs into an array
@@ -128,8 +130,22 @@ fi
 
 # Run the DAQ!
 echo "$DAQEXE $DAQ_ARGS"
-
-
-
+sleep 5
 cd $REPODIR
+
+
+
+#################### END HELPERS ####################
+for IP in "${SYNC_IPS[@]}"
+do
+    ssh $REMOTE_USR@$IP "touch $ENDSYNC"
+done
+
+for IP in "${RDOUT_IPS[@]}"
+do
+    ssh $REMOTE_USR@$IP "touch $ENDRDOUT"
+done
+
+
+
 exit

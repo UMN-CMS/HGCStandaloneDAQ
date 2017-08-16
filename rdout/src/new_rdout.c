@@ -331,9 +331,12 @@ int main(int argc, char *argv[])
 	CTL_put_done();
 
 	//for(i = 0; i < maxevents; i = i + 1) {
-    while(1) {
+    i = 0;
+    int exit = 0;
+    while(++i) {
 
-		//if( !(i % 10) && (access( "stop.run.please", R_OK ) != -1) ) break;// exit if file is created     
+		// if( !(i % 10) && (access( "stop.run.please", R_OK ) != -1) ) break;// exit if file is created
+		if( access( "stop.run.please", R_OK ) != -1 ) break;// exit if file is created
 
 		// Get hexaboards ready.
 		for(hexbd = 0; hexbd < MAXHEXBDS; hexbd++) {
@@ -379,8 +382,11 @@ int main(int argc, char *argv[])
 			// Wait for trigger.
 			trig0 = old_trig0;
 			while (trig0 == old_trig0) {
+                printf("waitingfortrig\n");
+                if( access( "stop.run.please", R_OK ) != -1 ) {exit=1;break;}// exit if file is created
 				trig0 = CTL_get_trig_count0();
 			}
+        if(exit) break;
 
 			CTL_put_date_stamp0(0); // We have received a trigger, so its not OK to receive another one till readout is complete and SKIs are reset.
 

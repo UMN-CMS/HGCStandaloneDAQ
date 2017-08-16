@@ -38,12 +38,22 @@ CTL_ORM=4
 
 # Other
 SYNC_ARGS="$PED"
+END_FILE="$SYNCDIR/stop.run.please"
+
+
+
+#################### STARTUP ####################
+# Remove end file so the helper process will run
+if [ -f $END_FILE ]
+then
+    rm $END_FILE
+fi
 
 
 
 #################### FW INSTALL ####################
 # Sync ORM
-# sudo $PROGEXE $SYNC_ORM < $SYNC_FW
+echo "sudo $PROGEXE $SYNC_ORM < $SYNC_FW"
 # TODO CHECK SUCCESS
 
 
@@ -54,5 +64,4 @@ $COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-# nohup sudo $SYNCEXE $SYNC_ARGS &> /dev/null &
-# echo "$!" # print out pid of previous command
+nohup sudo $SYNCEXE $SYNC_ARGS &> log.txt &
