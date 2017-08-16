@@ -5,3 +5,5 @@ gcc -O src/new_rdout.c src/ejf_rdout.c src/ctl_orm.c src/data_orm.c src/hexbd.c 
 gcc src/sleep.c -o bin/take_a_nap
 
 gcc -O src/pwr_cycle_fpgas.c src/ejf_rdout.c src/ctl_orm.c src/data_orm.c src/hexbd.c src/hexbd_config.c src/spi_common.c -l bcm2835 -o bin/pwr_cycle_fpgas
+
+gcc -O src/set_ip_mac_address.c src/ctl_orm.c src/spi_common.c -l bcm2835 -o bin/set_ip_mac_address

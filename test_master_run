@@ -4,6 +4,7 @@
 
 
 #################### STARTUP ####################
+# Argument processing
 if [ "$#" -eq 3 ] # Make sure there are zero or two arguments
 then
     RUN_NUMBER=$1
@@ -19,6 +20,7 @@ else
     exit
 fi
 
+# Check directory
 REPODIR="$PWD"                  # Get current working directory
 if [ ! -d "$REPODIR/.git/" ]    # Make sure it's the highest directory in the repo
 then
@@ -57,6 +59,7 @@ RSYNC_FLAGS="-az --delete"                      # Flags used with rsync (archive
 RDOUT_ARGS="$RUN_NUMBER $MAXEVENTS $PED"        # Arguments fed to the readout script
 SYNC_ARGS="$PED"                                # Arguments fed to the sync script
 DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $PED $DATADIR" # Arguments fed to the DAQ
+
 
 
 #################### FILE COPY ####################

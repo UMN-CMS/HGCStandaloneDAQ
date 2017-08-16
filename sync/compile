@@ -5,3 +5,5 @@ gcc -O src/sync_debug.c src/sync_orm.c src/spi_common.c -l bcm2835 -o bin/sync_d
 gcc -O src/enable_triggers.c src/sync_orm.c src/spi_common.c -l bcm2835 -o bin/enable_triggers
 
 gcc -O src/get_trigger_enabled.c src/sync_orm.c src/spi_common.c -l bcm2835 -o bin/get_trigger_enabled
+
+gcc -O src/set_ip_mac_address.c src/ctl_orm.c src/spi_common.c -l bcm2835 -o bin/set_ip_mac_address
