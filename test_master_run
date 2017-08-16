@@ -64,16 +64,22 @@ DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $PED $DATADIR" # Arguments fed to the DAQ
 
 #################### FILE COPY ####################
 # Read file and transfer data
-echo "Beginning file copy process"
 for IP in "${RDOUT_IPS[@]}"
 do
     echo "Copying $RDOUTDIR to $IP:$REMOTE_RDOUTDIR"
     rsync $RSYNC_FLAGS $RDOUTDIR $REMOTE_USR@$IP:~/ >> /dev/null
-
     # If something goes wrong, let the user know and exit
     if [ $? -ne 0 ]
     then
         echo "rsync with" $IP "failed - aborting."
+        exit 1
+    fi
+
+    scp -r $COMMONDIR/* $REMOTE_USR@$IP:$REMOTE_RDOUTDIR >> /dev/null
+    # If something goes wrong, let the user know and exit
+    if [ $? -ne 0 ]
+    then
+        echo "scp with" $IP "failed - aborting."
         exit 1
     fi
 done
@@ -82,14 +88,19 @@ for IP in "${SYNC_IPS[@]}"
 do
     echo "Copying $SYNCDIR to $IP:$REMOTE_SYNCDIR"
     rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:~/ >> /dev/null
-
     if [ $? -ne 0 ]
     then
         echo "rsync with" $IP "failed - aborting"
         exit 1
     fi
+
+    scp -r $COMMONDIR/* $REMOTE_USR@$IP:$REMOTE_RDOUTDIR >> /dev/null
+    if [ $? -ne 0 ]
+    then
+        echo "scp with" $IP "failed - aborting"
+        exit 1
+    fi
 done
-echo "File copying complete"
 
 
 
