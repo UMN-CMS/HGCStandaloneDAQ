@@ -1,6 +1,6 @@
 #ifndef DATAFORMAT_HPP
 #define DATAFORMAT_HPP
 
-const int BLOCKSIZE = 100;
+const int BLOCKSIZE = 30787;
 
 #endif

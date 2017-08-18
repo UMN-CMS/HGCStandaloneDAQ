@@ -27,11 +27,10 @@ int main() {
     printf("old MAC1 Address: %x\n", mac1);
     printf("old MAC2 Address: %x\n", mac2);
 
-    return 0;
-    CTL_put_ip_address0(0xdec8);
+    CTL_put_ip_address0(0xdc97);
     CTL_put_ip_address1(0xc0a8);
 
-    CTL_put_mac_address0(0xffaf);
+    CTL_put_mac_address0(0xff97);
     CTL_put_mac_address1(0x3200);
     CTL_put_mac_address2(0x0800);
 

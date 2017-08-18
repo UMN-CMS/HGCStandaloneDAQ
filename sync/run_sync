@@ -61,7 +61,8 @@ fi
 
 #################### FW INSTALL ####################
 # Sync ORM
-echo "sudo $PROGEXE $SYNC_ORM < $SYNC_FW"
+echo "Programming ORM $SYNC_ORM"
+sudo $PROGEXE $SYNC_ORM < $SYNC_FW
 # TODO CHECK SUCCESS
 
 
@@ -72,4 +73,5 @@ $COMPILE
 # TODO CHECK SUCCESS
 
 # Run
-nohup sudo $SYNCEXE $SYNC_ARGS &> log.txt &
+# nohup sudo $SYNCEXE $SYNC_ARGS &> log.txt &
+sudo $SYNCEXE $SYNC_ARGS

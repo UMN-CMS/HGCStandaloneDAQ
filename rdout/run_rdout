@@ -3,14 +3,12 @@
 
 
 #################### Arguments ####################
-if [ $# -ne 3 ]
+if [ $# -ne 1 ]
 then
-    echo "Incorrect arguments. Should be [RUN NUMBER] [EVENTS] [PEDESTAL]"
+    echo "Incorrect arguments. Should be [PEDESTAL]"
     exit 1
 fi
-RUNNUM=$1
-EVENTS=$2
-PED=$3
+PED=$1
 
 
 
@@ -39,7 +37,7 @@ DATA_ORMS=( 0 1 2 3 )
 CTL_ORM=4
 
 # Other
-RDOUT_ARGS="$RUNNUM $EVENTS $PED"
+RDOUT_ARGS="$PED"
 END_FILE="$RDOUTDIR/stop.run.please"
 
 
@@ -64,13 +62,16 @@ fi
 # Data ORMs
 for ORM in "${DATA_ORMS[@]}"
 do
-    echo "sudo $PROGEXE $ORM < $DATA_FW >> /dev/null"
+    echo "Programming ORM $ORM"
+    sudo $PROGEXE $ORM < $DATA_FW >> /dev/null
     # TODO CHECK SUCCESS
 done
 
 # CTL ORM
-echo "sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null"
+echo "Programming ORM $CTL_ORM"
+sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null
 # TODO CHECK SUCCESS
+
 
 
 
@@ -78,6 +79,8 @@ echo "sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null"
 # Compile (using the compile script)
 $COMPILE
 # TODO CHECK SUCCESS
+sudo ./bin/set_ip_mac_address
 
 # Run
-nohup sudo $RDOUTEXE $RDOUT_ARGS &> log.txt &
+# nohup sudo $RDOUTEXE $RDOUT_ARGS &> log.txt &
+sudo $RDOUTEXE $RDOUT_ARGS

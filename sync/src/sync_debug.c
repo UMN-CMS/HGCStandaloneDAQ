@@ -13,8 +13,9 @@
 #define AHCAL_MASK 0x8000
 // OR together the devices that you want (i.e. PI2_MASK | PI3_MASK)
 //#define RDOUT_MASK ( PI1_MASK | PI2_MASK )
-#define RDOUT_MASK (PI1_MASK | PI2_MASK | PI3_MASK )
+//#define RDOUT_MASK (PI1_MASK | PI2_MASK | PI3_MASK )
 //#define RDOUT_MASK (PI1_MASK | PI2_MASK | PI3_MASK | AHCAL_MASK)
+#define RDOUT_MASK 0x0001
 
 // ANABLE_VETO1 Options:
 // 0 - ignores AHCAL

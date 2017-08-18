@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
     char fname[50];
     if(PED) sprintf(fname, "%s/PED_RUN%i_%s.raw", DATADIR.c_str(), RUNNUMBER, time_str);
     else sprintf(fname, "%s/RUN%i_%s.raw", DATADIR.c_str(), RUNNUMBER, time_str);
+    printf("Filename will be %s\n", fname);
 
     // open file
     std::ofstream fout(fname, std::ofstream::binary);
@@ -71,20 +72,25 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
     }
+    printf("After conn test\n");
 
 
     /*** main event loop ***/
     for(event = 0; event < MAXEVENTS; event++) {
+        printf("Event %i begin\n", event);
         for(auto& rdout : rdouts) {
+            printf("in rdout loop\n");
 
             // wait for block ready
             while(!get_word(rdout, BLOCK_READY)) {
-                break;// TODO DELETE THIS LINE WHEN THINGS ACTUALLY WORK!
+                // break;// TODO DELETE THIS LINE WHEN THINGS ACTUALLY WORK!
+                printf("Waiting for block ready\n");
                 continue;
             }
 
             // get the event data
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
+            printf("Got the data\n");
 
             // TODO check the data
             if(!verify_data(ev_data)) {
@@ -94,11 +100,14 @@ int main(int argc, char *argv[]) {
 
             // write the event data to a separate file for each rdout board
             write_data(fout, ev_data);
+            printf("Wrote the data\n");
 
             // check if the fifo is empty, if not then read til it is empty
             while(!get_word(rdout, EMPTY)) {
-                break;// TODO DELETE THIS LINE WHEN THINGS ACTUALLY WORK!
-                (void) get_word(rdout, FIFO);
+                printf("FIFO is not empty!\n");
+                break;
+                // break;// TODO DELETE THIS LINE WHEN THINGS ACTUALLY WORK!
+                // (void) get_word(rdout, FIFO);
             }
 
             // send rdout done magic
