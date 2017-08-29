@@ -15,7 +15,7 @@ MAC=$3
 
 
 #################### Variables ####################
-RDOUT_NAME="new_rdout"
+RDOUT_NAME="rdout_helper"
 
 # Directories
 RDOUTDIR="$PWD"
@@ -43,6 +43,7 @@ CTL_ORM=4
 RDOUT_ARGS="$PED"
 END_FILE="$RDOUTDIR/stop.run.please"
 IP_ARGS="$IP $MAC"
+LOGFILE="$RDOUTDIR/rdout.log"
 
 
 
@@ -60,6 +61,9 @@ then
     sudo kill $TMP
 fi
 
+# Clean up the log file
+echo "" > $LOGFILE
+
 
 
 #################### FW INSTALL ####################
@@ -67,30 +71,30 @@ fi
 for ORM in "${DATA_ORMS[@]}"
 do
     printf "\tProgramming DATA ORM $ORM\n"
-    sudo $PROGEXE $ORM < $DATA_FW >> /dev/null
+    sudo $PROGEXE $ORM < $DATA_FW >> $LOGFILE
     # TODO CHECK SUCCESS
 done
 
 # CTL ORM
 printf "\tProgramming CTL ORM\n"
-sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null
+sudo $PROGEXE $CTL_ORM < $CTL_FW >> $LOGFILE
 # TODO CHECK SUCCESS
 
 
 
 #################### COMPILE ####################
 # Compile (using the compile script)
-$COMPILE
+$COMPILE >> $LOGFILE
 # TODO CHECK SUCCESS
 
 
 
 #################### SET IP & MAC ####################
 printf "\tSetting IP and MAC addresses\n"
-sudo $IPEXE $IP_ARGS
+sudo $IPEXE $IP_ARGS >> $LOGFILE
 
 
 
 #################### RUN RDOUT HELPER ####################
 # Run
-nohup sudo $RDOUTEXE $RDOUT_ARGS &> log.txt &
+nohup sudo $RDOUTEXE $RDOUT_ARGS &> $LOGFILE &

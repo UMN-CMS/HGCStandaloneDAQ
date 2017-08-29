@@ -39,6 +39,7 @@ CTL_ORM=4
 # Other
 SYNC_ARGS="$PED"
 END_FILE="$SYNCDIR/stop.run.please"
+LOGFILE="$SYNCDIR/sync.log"
 
 
 
@@ -61,18 +62,26 @@ fi
 #################### FW INSTALL ####################
 # Sync ORM
 printf "\tProgramming CTL ORM\n"
-sudo $PROGEXE $SYNC_ORM < $SYNC_FW &> /dev/null
-# TODO CHECK SUCCESS
+sudo $PROGEXE $SYNC_ORM < $SYNC_FW >> $LOGFILE
+if [ $? -ne 0 ]
+then
+    printf "Programming failed. Aborting\n"
+    exit 1
+fi
 
 
 
 #################### COMPILE ####################
 # Compile (using the compile script)
-$COMPILE
-# TODO CHECK SUCCESS
+$COMPILE >> $LOGFILE
+if [ $? -ne 0 ]
+then
+    printf "Compilation failed. Aborting\n"
+    exit 1
+fi
 
 
 
 #################### RUN SYNC HELPER ####################
 # Run
-nohup sudo $SYNCEXE $SYNC_ARGS &> log.txt &
+nohup sudo $SYNCEXE $SYNC_ARGS &> $LOGFILE &
