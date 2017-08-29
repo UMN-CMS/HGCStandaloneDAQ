@@ -1,10 +1,10 @@
 # HGCStandaloneDAQ
 A standalone DAQ for HGCal
 
+To run, execute `test_master_run` in the main directory. This defaults to run number 0 with 1000 events and real triggers. You can change the default settings by supplying the following arguments to `test_master_run`:
+```
+./test_master_run [RUN NUMBER] [EVENTS] [PEDESTAL]
+```
+Pedestals are not currently supported, so the PEDESTAL argument must be 0.
 
-## HGCStandaloneDAQ/daq
-Contains the DAQ source files.
-
-The DAQ can be compiled by running `make` in this folder. Before starting a run, the environment must be set by using `source etc/env.sh`.
-
-To run the DAQ, use `./bin/main [RUN NUMBER] [EVENTS]`. For convenience, a script named `run_test_daq` has been provided to set the environment, compile, and run the DAQ for 1000 events for testing.
+## MORE DOCS TO COME
