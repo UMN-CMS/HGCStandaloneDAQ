@@ -74,7 +74,6 @@ int main(int argc, char *argv[])
 
     // Power cycle the ORMs.
     if (0) {
-        /*
            fprintf(stderr,"power cycle orm: data_0...");
            power_cycle(0); // DATA_0
            fprintf(stderr,"done.\n");
@@ -87,7 +86,7 @@ int main(int argc, char *argv[])
            power_cycle(2); // DATA_2
            fprintf(stderr,"done.\n");
            sleep(1);
-           */
+           
         fprintf(stderr,"power cycle orm: data_3...");
         power_cycle(3); // DATA_3
         fprintf(stderr,"done.\n");
@@ -173,8 +172,12 @@ int main(int argc, char *argv[])
     // Run a test on each of the8 hexaboards looking for good communication.
     int hexbd_mask;
     hexbd_mask = HEXBD_verify_communication(1);
-    //hexbd_mask = 1; // debug
+    // hexbd_mask = 1; // debug
     fprintf(stderr,"hexbd_mask = 0x%02x\n",(int)hexbd_mask);
+    if(hexbd_mask == 0) {
+	    fprintf(stderr, "hexbd_mask is 0. Aborting\n");
+	    return 1;
+    }
 
     // Set the skiroc mask.
     int skiroc_mask0, skiroc_mask1;
@@ -268,6 +271,7 @@ int main(int argc, char *argv[])
     int fifo_ready, block_ready, block_ready0, block_ready1, skiroc, j;
     int value0, value1;
     int raw_it;
+
     // Send a pulse back to the SYNC board. Give us a trigger.
     CTL_put_done();
 
@@ -338,6 +342,11 @@ int main(int argc, char *argv[])
 
                 // tell skirocs to send data back
                 res = HEXBD_send_command(hexbd, CMD_STARTCONPUL);
+		/*
+		usleep(HX_DELAY3);
+		res = HEXBD_send_command(hexbd, CMD_STARTROPUL);
+		usleep(HX_DELAY4);
+		*/
 
             }// if hexbd_mask
         }// hexbd loop
@@ -349,6 +358,7 @@ int main(int argc, char *argv[])
 
                 // tell skirocs to send data back
                 res = HEXBD_send_command(hexbd, CMD_STARTROPUL);
+		printf("Hi\n");
 
             }// if hexbd_mask
         }// hexbd loop
@@ -356,11 +366,11 @@ int main(int argc, char *argv[])
         usleep(HX_DELAY4);
 
         int isFifoEmpty = 0;
-
         printf("Waiting for fifo to empty\n");
         while(!isFifoEmpty){
             isFifoEmpty = CTL_get_empty();
         }
+	printf("Fifo is empty\n");
 
     }// event loop
 

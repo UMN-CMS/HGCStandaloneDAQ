@@ -3,12 +3,14 @@
 
 
 #################### Arguments ####################
-if [ $# -ne 1 ]
+if [ $# -ne 3 ]
 then
-    echo "Incorrect arguments. Should be [PEDESTAL]"
+    printf "Incorrect arguments. Should be [PEDESTAL] [IPBUS IP] [IPBUS MAC]\n"
     exit 1
 fi
 PED=$1
+IP=$2
+MAC=$3
 
 
 
@@ -27,6 +29,7 @@ RDOUTEXE="$BINDIR/$RDOUT_NAME"
 SLEEPEXE="$BINDIR/take_a_nap"
 PWREXE="$BINDIR/pwr_cycle_fpgas"
 COMPILE="$RDOUTDIR/compile"
+IPEXE="$BINDIR/set_ip_mac_address"
 
 # Firmware Files
 DATA_FW="$FWDIR/data_orm1.hex"
@@ -39,6 +42,7 @@ CTL_ORM=4
 # Other
 RDOUT_ARGS="$PED"
 END_FILE="$RDOUTDIR/stop.run.please"
+IP_ARGS="$IP $MAC"
 
 
 
@@ -62,25 +66,31 @@ fi
 # Data ORMs
 for ORM in "${DATA_ORMS[@]}"
 do
-    echo "Programming ORM $ORM"
+    printf "\tProgramming DATA ORM $ORM\n"
     sudo $PROGEXE $ORM < $DATA_FW >> /dev/null
     # TODO CHECK SUCCESS
 done
 
 # CTL ORM
-echo "Programming ORM $CTL_ORM"
+printf "\tProgramming CTL ORM\n"
 sudo $PROGEXE $CTL_ORM < $CTL_FW >> /dev/null
 # TODO CHECK SUCCESS
 
 
 
-
-#################### RUN RDOUT ####################
+#################### COMPILE ####################
 # Compile (using the compile script)
 $COMPILE
 # TODO CHECK SUCCESS
-sudo ./bin/set_ip_mac_address
 
+
+
+#################### SET IP & MAC ####################
+printf "\tSetting IP and MAC addresses\n"
+sudo $IPEXE $IP_ARGS
+
+
+
+#################### RUN RDOUT HELPER ####################
 # Run
-# nohup sudo $RDOUTEXE $RDOUT_ARGS &> log.txt &
-sudo $RDOUTEXE $RDOUT_ARGS
+nohup sudo $RDOUTEXE $RDOUT_ARGS &> log.txt &

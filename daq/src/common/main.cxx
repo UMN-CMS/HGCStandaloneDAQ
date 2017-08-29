@@ -7,6 +7,7 @@
 #include <fstream>
 #include <map>
 #include <ctime>
+#include <unistd.h>
 
 
 
@@ -29,7 +30,7 @@ int main(int argc, char *argv[]) {
     uhal::setLogLevelTo(uhal::Error());// otherwise there's a bunch of crap printed out
 
     // iterators
-    int event;
+    int event, i;
 
     // containers
     std::vector<uhal::HwInterface> rdouts;
@@ -72,25 +73,31 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
     }
-    printf("After conn test\n");
 
 
     /*** main event loop ***/
     for(event = 0; event < MAXEVENTS; event++) {
-        printf("Event %i begin\n", event);
+
+        // to give a sense of time
+        if(!(event % 10)) printf("Event %i\n", event);
+
+        // loop over readout boards
         for(auto& rdout : rdouts) {
-            printf("in rdout loop\n");
 
             // wait for block ready
+            i = 0;
             while(!get_word(rdout, BLOCK_READY)) {
-                // break;// TODO DELETE THIS LINE WHEN THINGS ACTUALLY WORK!
-                printf("Waiting for block ready\n");
-                continue;
+                if(i > 20000) {
+                    // sometimes the syncboard doesn't see the readout done signal
+                    // so we send the done signal again if it takes too long
+                    put_word(rdout, RDOUT_DONE, RDOUT_DONE_MAGIC);
+                    i = 0;
+                }
+                i++;
             }
 
             // get the event data
             std::vector<uint32_t> ev_data = get_nwords(rdout, FIFO, BLOCKSIZE);
-            printf("Got the data\n");
 
             // TODO check the data
             if(!verify_data(ev_data)) {
@@ -98,16 +105,12 @@ int main(int argc, char *argv[]) {
                 exit(1);
             }
 
-            // write the event data to a separate file for each rdout board
+            // write the event data
             write_data(fout, ev_data);
-            printf("Wrote the data\n");
 
             // check if the fifo is empty, if not then read til it is empty
             while(!get_word(rdout, EMPTY)) {
-                printf("FIFO is not empty!\n");
-                break;
-                // break;// TODO DELETE THIS LINE WHEN THINGS ACTUALLY WORK!
-                // (void) get_word(rdout, FIFO);
+                (void) get_word(rdout, FIFO);
             }
 
             // send rdout done magic

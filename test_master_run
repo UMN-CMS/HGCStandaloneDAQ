@@ -20,6 +20,12 @@ else
     exit
 fi
 
+if [ $PED -eq 1 ]
+then
+    echo "Pedestal not currently supported"
+    exit
+fi
+
 # Check directory
 REPODIR="$PWD"                  # Get current working directory
 if [ ! -d "$REPODIR/.git/" ]    # Make sure it's the highest directory in the repo
@@ -36,6 +42,7 @@ fi
 DAQDIR="$REPODIR/daq"                       	# Folder containing DAQ software
 RDOUTDIR="$REPODIR/rdout"                   	# Folder containing software for RDOUT Pis
 SYNCDIR="$REPODIR/sync"                     	# Folder containing software for SYNC Pis
+COMMONDIR="$REPODIR/common"                     # Folder containing software common to RDOUT and SYNC Pis
 DATADIR="$REPODIR/data"                     	# Folder for the data files
 REMOTE_RDOUTDIR="~/rdout"                   	# Folder on Pi to contain RDOUT software
 REMOTE_SYNCDIR="~/sync"                     	# Folder on Pi to contain SYNC software
@@ -56,48 +63,65 @@ SYNC_IPS=($(cat $SYNC_IP_FILE))             	# Read sync IPs into an array
 # Other
 REMOTE_USR="pi"                                 # User on the raspberry Pis
 RSYNC_FLAGS="-az --delete"                      # Flags used with rsync (archive/recursive, compress, delete removed files)
-RDOUT_ARGS="$RUN_NUMBER $MAXEVENTS $PED"        # Arguments fed to the readout script
+RDOUT_ARGS="$PED"                               # Arguments fed to the readout script (excluding IPBus IP and MAC addresses)
 SYNC_ARGS="$PED"                                # Arguments fed to the sync script
 DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $PED $DATADIR" # Arguments fed to the DAQ
+RPI_PREFIX="192.168.222."                       # Prefix for the Pis' IP addresses
+IPBUS_PREFIX="192.168.220."                     # Prefix for the IPBus IP addresses
+IPB_MAC_PREFIX="08:00:32:00:ff:"                # Prefix for the IPBus MAC addresses
+
+
+
+#################### MAKE DIRS ####################
+for IP in "${RDOUT_IPS[@]}"
+do
+    ssh $REMOTE_USR@$RPI_PREFIX$IP mkdir $REMOTE_RDOUTDIR &> /dev/null
+done
+
+for IP in "${SYNC_IPS[@]}"
+do
+    ssh $REMOTE_USR@$RPI_PREFIX$IP mkdir $REMOTE_SYNCDIR &> /dev/null
+done
 
 
 
 #################### FILE COPY ####################
-# Read file and transfer data
+printf "\n"
+# Transfer data
 for IP in "${RDOUT_IPS[@]}"
 do
-    echo "Copying $RDOUTDIR to $IP:$REMOTE_RDOUTDIR"
-    rsync $RSYNC_FLAGS $RDOUTDIR $REMOTE_USR@$IP:~/ >> /dev/null
+    printf "Copying $RDOUTDIR to $RPI_PREFIX$IP:$REMOTE_RDOUTDIR\n"
+    rsync $RSYNC_FLAGS $RDOUTDIR $REMOTE_USR@$RPI_PREFIX$IP:~/ >> /dev/null
     # If something goes wrong, let the user know and exit
     if [ $? -ne 0 ]
     then
-        echo "rsync with" $IP "failed - aborting."
+        printf "rsync with %s failed - aborting.\n" "$IP"
         exit 1
     fi
 
-    scp -r $COMMONDIR/* $REMOTE_USR@$IP:$REMOTE_RDOUTDIR >> /dev/null
+    scp -r $COMMONDIR/* $REMOTE_USR@$RPI_PREFIX$IP:$REMOTE_RDOUTDIR >> /dev/null
     # If something goes wrong, let the user know and exit
     if [ $? -ne 0 ]
     then
-        echo "scp with" $IP "failed - aborting."
+        printf "scp with %s failed - aborting.\n" "$IP"
         exit 1
     fi
 done
 
 for IP in "${SYNC_IPS[@]}"
 do
-    echo "Copying $SYNCDIR to $IP:$REMOTE_SYNCDIR"
-    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:~/ >> /dev/null
+    printf "Copying $SYNCDIR to $RPI_PREFIX$IP:$REMOTE_SYNCDIR\n"
+    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$RPI_PREFIX$IP:~/ >> /dev/null
     if [ $? -ne 0 ]
     then
-        echo "rsync with" $IP "failed - aborting"
+        printf "rsync with %s failed - aborting\n" "$IP"
         exit 1
     fi
 
-    scp -r $COMMONDIR/* $REMOTE_USR@$IP:$REMOTE_RDOUTDIR >> /dev/null
+    scp -r $COMMONDIR/* $REMOTE_USR@$RPI_PREFIX$IP:$REMOTE_SYNCDIR >> /dev/null
     if [ $? -ne 0 ]
     then
-        echo "scp with" $IP "failed - aborting"
+        printf "scp with %s failed - aborting\n" "$IP"
         exit 1
     fi
 done
@@ -105,20 +129,42 @@ done
 
 
 #################### FW INSTALL, SW EXECUTION ####################
+printf "\n"
 for IP in "${SYNC_IPS[@]}"
 do
-    ssh $REMOTE_USR@$IP "cd $REMOTE_SYNCDIR; ./$REMOTE_SYNC_EXE $SYNC_ARGS"
+    printf "SYNC at %s\n" "$RPI_PREFIX$IP"
+    ssh $REMOTE_USR@$RPI_PREFIX$IP "cd $REMOTE_SYNCDIR; ./$REMOTE_SYNC_EXE $SYNC_ARGS"
+    printf "\n"
 done
 
 for IP in "${RDOUT_IPS[@]}"
 do
-    ssh $REMOTE_USR@$IP "cd $REMOTE_RDOUTDIR; ./$REMOTE_RDOUT_EXE $RDOUT_ARGS"
+    MAC=$(echo "obase=16; $IP" | bc)
+    printf "RDOUT at %s\n" "$RPI_PREFIX$IP"
+    ssh $REMOTE_USR@$RPI_PREFIX$IP "cd $REMOTE_RDOUTDIR; ./$REMOTE_RDOUT_EXE $RDOUT_ARGS $IPBUS_PREFIX$IP $IPB_MAC_PREFIX$MAC"
+    printf "\n"
+done
+
+
+
+## WAIT FOR PING ##
+printf "Waiting for readout boards to appear\n"
+for IP in "${RDOUT_IPS[@]}"
+do
+    ping -c 1 $IPBUS_PREFIX$IP >> /dev/null
+    TMP=$?
+    while [ $TMP -ne 0 ]
+    do
+        ping -c 1 $IPBUS_PREFIX$IP >> /dev/null
+        TMP=$?
+    done
+    printf "\tRDOUT $IP appeared\n"
 done
 
 
 
 #################### DAQ ####################
-echo "Starting DAQ"
+printf "\nStarting DAQ\n"
 cd $DAQDIR
 
 
@@ -138,26 +184,28 @@ fi
 make >> /dev/null
 if [ $? -ne 0 ]
 then
-    echo "The DAQ failed to compile! Aborting run."
+    printf "The DAQ failed to compile! Aborting run.\n"
+    exit
 fi
 
 
 # Run the DAQ!
-echo "$DAQEXE $DAQ_ARGS"
-sleep 5
+printf "\n"
+$DAQEXE $DAQ_ARGS
 cd $REPODIR
 
 
 
 #################### END HELPERS ####################
+printf "\nEnding helpers\n"
 for IP in "${SYNC_IPS[@]}"
 do
-    ssh $REMOTE_USR@$IP "touch $ENDSYNC"
+    ssh $REMOTE_USR@$RPI_PREFIX$IP "touch $ENDSYNC"
 done
 
 for IP in "${RDOUT_IPS[@]}"
 do
-    ssh $REMOTE_USR@$IP "touch $ENDRDOUT"
+    ssh $REMOTE_USR@$RPI_PREFIX$IP "touch $ENDRDOUT"
 done
 
 

@@ -23,7 +23,7 @@ REPODIR="$PWD"
 # Directories
 RDOUTDIR="$REPODIR/rdout"                   	# Folder containing software for RDOUT Pis
 SYNCDIR="$REPODIR/sync"                     	# Folder containing software for SYNC Pis
-COMMONDIR="$REPODIR/common/"                    # Folder containing software common to RDOUT and SYNC Pis
+COMMONDIR="$REPODIR/common"                     # Folder containing software common to RDOUT and SYNC Pis
 REMOTE_RDOUTDIR="~/rdout"                   	# Folder on Pi to contain RDOUT software
 REMOTE_SYNCDIR="~/sync"                     	# Folder on Pi to contain SYNC software
 
@@ -38,6 +38,19 @@ SYNC_IPS=($(cat $SYNC_IP_FILE))             	# Read sync IPs into an array
 # Other
 REMOTE_USR="pi"                                 # User on the raspberry Pis
 RSYNC_FLAGS="-az --delete"                      # Flags used with rsync (archive/recursive, compress, delete removed files)
+
+
+
+#################### MAKE DIRS ####################
+for IP in "${RDOUT_IPS[@]}"
+do
+    ssh $REMOTE_USR@$IP mkdir $REMOTE_RDOUTDIR &> /dev/null
+done
+
+for IP in "${SYNC_IPS[@]}"
+do
+    ssh $REMOTE_USR@IP mkdir $REMOTE_SYNCDIR &> /dev/null
+done
 
 
 
@@ -66,7 +79,7 @@ done
 for IP in "${SYNC_IPS[@]}"
 do
     echo "Copying $SYNCDIR to $IP:$REMOTE_SYNCDIR"
-    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:~/ >> /dev/null
+    rsync $RSYNC_FLAGS $SYNCDIR $REMOTE_USR@$IP:$REMOTE_SYNCDIR/ >> /dev/null
     if [ $? -ne 0 ]
     then
         echo "rsync with" $IP "failed - aborting"

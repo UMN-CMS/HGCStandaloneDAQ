@@ -22,7 +22,7 @@ fi
 
 
 # Run the DAQ!
-./bin/main 0 100 1 ../data/
+./bin/main 0 2000 1 ../data/
 
 
 exit
