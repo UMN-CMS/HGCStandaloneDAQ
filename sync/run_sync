@@ -13,7 +13,7 @@ PED=$1
 
 
 #################### Variables ####################
-SYNC_NAME="sync_debug"
+SYNC_NAME="sync_helper"
 
 # Directories
 SYNCDIR="$PWD"
