@@ -1,5 +1,7 @@
 #!/bin/bash
 # Copies rdout/ and sync/ directories to the Raspberry Pis
+echo "DOES NOT WORK RIGHT NOW"
+exit
 
 
 
