@@ -1,6 +1,25 @@
 #include "ejf_rdout.h"
 #include "ctl_orm.h"
 
+int readout_skiroc_fifo(int block_size)
+{
+    // Wait for block_ready.
+    int block_ready;
+    block_ready = CTL_get_block_ready();
+    while(block_ready == 0) block_ready = CTL_get_block_ready();
+
+    // Get a block of values.
+    int j, value0, value1, value;
+    for (j=0; j<block_size; j++) {
+        value0 = CTL_get_fifo_LS16();
+        value1 = CTL_get_fifo_MS16();
+        raw_32bit_new[j] = (value1<<16) | value0;
+    }
+
+    // Reset fifos.
+    CTL_reset_fifos();
+}
+
 int power_cycle_just_fpgas()
 {
   char PAGE[1];

@@ -1,4 +1,4 @@
-// gcc -O new_rdout.c ejf_rdout.c ctl_orm.c data_orm.c hexbd.c hexbd_config.c spi_common.c -l bcm2835 -o new_rdout.exe
+// gcc -O rdout_helper.c ejf_rdout.c ctl_orm.c data_orm.c hexbd.c hexbd_config.c spi_common.c -l bcm2835 -o rdout_helper
 
 #include <bcm2835.h>
 #include <stdio.h>
@@ -17,54 +17,29 @@
 #include "ejf_rdout.h"
 #include "spi_common.h"
 
-int readout_skiroc_fifo(int block_size)
-{
-    // Wait for block_ready.
-    int block_ready;
-    block_ready = CTL_get_block_ready();
-    while(block_ready == 0) block_ready = CTL_get_block_ready();
 
-    // Get a block of values.
-    int j, value0, value1, value;
-    for (j=0; j<block_size; j++) {
-        value0 = CTL_get_fifo_LS16();
-        value1 = CTL_get_fifo_MS16();
-        raw_32bit_new[j] = (value1<<16) | value0;
-    }
+#define doPwrCycle 0
 
-    // Reset fifos.
-    CTL_reset_fifos();
-}
+
 
 //========================================================================
 // MAIN
 //========================================================================
 
-int main(int argc, char *argv[])
-{
-    int res,status;
-    int ch, sample, chip;
+int main(int argc, char *argv[]) {
+    int res;
     int i, k, hexbd;
-    time_t rawtime;
-    bool saveraw;
-    struct tm *info;
-    char buffer[80];
-    char fname [160];
-    char dirname[] = "/home/pi/RDOUT_BOARD_IPBus/rdout_software/data/";
-
-    int maxevents = 1000;
-    char instr [1024];
+    int isFifoEmpty;
 
     int hx;
     int junk[2000];
 
     // Setting up number of run events, file name, etc
-    int runid = 0;
     int PED = 0;
 
     if( argc != 2 ){
         fprintf(stderr,"Incorrect arguments: <PED>\n");
-        return(0);
+        return 0 ;
     }
 
     PED = atoi(argv[1]);
@@ -73,27 +48,18 @@ int main(int argc, char *argv[])
     init_spi();
 
     // Power cycle the ORMs.
-    if (0) {
-           fprintf(stderr,"power cycle orm: data_0...");
-           power_cycle(0); // DATA_0
-           fprintf(stderr,"done.\n");
-           sleep(1);
-           fprintf(stderr,"power cycle orm: data_1...");
-           power_cycle(1); // DATA_1
-           fprintf(stderr,"done.\n");
-           sleep(1);
-           fprintf(stderr,"power cycle orm: data_2...");
-           power_cycle(2); // DATA_2
-           fprintf(stderr,"done.\n");
-           sleep(1);
-           
-        fprintf(stderr,"power cycle orm: data_3...");
-        power_cycle(3); // DATA_3
-        fprintf(stderr,"done.\n");
-        sleep(1);
-        fprintf(stderr,"power cycle orm: ctl...");
-        power_cycle(4); // CTL
-        fprintf(stderr,"done.\n");
+    if (doPwrCycle) {
+
+        for(i = 0; i < 5; i++) {
+            if(i == 4)
+                fprintf(stderr, "power cycle orm: data_%i...", i);
+            else
+                fprintf(stderr,"power cycle orm: ctl...");
+            power_cycle(i);
+            fprintf(stderr, "done.\n");
+            sleep(1);
+        }
+
         fprintf(stderr,"sleeping for 10s...");
         sleep(10);
         fprintf(stderr,"done.\n");
@@ -109,24 +75,12 @@ int main(int argc, char *argv[])
             (int)date_stamp1, (int)date_stamp0);
 
     // Reset everything. twice...
-    DATA_reset_all(0);
-    DATA_reset_all(1);
-    DATA_reset_all(2);
-    DATA_reset_all(3);
-    DATA_reset_all(4);
-    DATA_reset_all(5);
-    DATA_reset_all(6);
-    DATA_reset_all(7);
-    CTL_reset_all();
-    DATA_reset_all(0);
-    DATA_reset_all(1);
-    DATA_reset_all(2);
-    DATA_reset_all(3);
-    DATA_reset_all(4);
-    DATA_reset_all(5);
-    DATA_reset_all(6);
-    DATA_reset_all(7);
-    CTL_reset_all();
+    for(i = 0; i < 2; i++) {
+        for(k = 0; k < 8; k++) {
+            DATA_reset_all(k);
+        }
+        CTL_reset_all();
+    }
 
     // Get the firmware version.
     int version;
@@ -172,11 +126,10 @@ int main(int argc, char *argv[])
     // Run a test on each of the8 hexaboards looking for good communication.
     int hexbd_mask;
     hexbd_mask = HEXBD_verify_communication(1);
-    // hexbd_mask = 1; // debug
     fprintf(stderr,"hexbd_mask = 0x%02x\n",(int)hexbd_mask);
     if(hexbd_mask == 0) {
-	    fprintf(stderr, "hexbd_mask is 0. Aborting\n");
-	    return 1;
+        fprintf(stderr, "hexbd_mask is 0. Aborting\n");
+        return 1;
     }
 
     // Set the skiroc mask.
@@ -279,9 +232,9 @@ int main(int argc, char *argv[])
     int exit = 0;
     while(++i) {
 
-        printf("Event %i\n", i);
+        if(!((i - 1) % 10)) // every 10 events
+            printf("Event %i\n", i);
 
-        // if( !(i % 10) && (access( "stop.run.please", R_OK ) != -1) ) break;// exit if file is created
         if( access( "stop.run.please", R_OK ) != -1 ) break;// exit if file is created
 
         // Get hexaboards ready.
@@ -337,40 +290,28 @@ int main(int argc, char *argv[])
         }
 
 
+        // tell hexbds to convert the data
         for(hexbd = 0; hexbd < MAXHEXBDS; hexbd++) {
             if((hexbd_mask & (1 << hexbd)) != 0) {
-
-                // tell skirocs to send data back
                 res = HEXBD_send_command(hexbd, CMD_STARTCONPUL);
-		/*
-		usleep(HX_DELAY3);
-		res = HEXBD_send_command(hexbd, CMD_STARTROPUL);
-		usleep(HX_DELAY4);
-		*/
-
-            }// if hexbd_mask
-        }// hexbd loop
+            }
+        }
 
         usleep(HX_DELAY3);
 
+        // tell hexbds to send the data back
         for(hexbd = 0; hexbd < MAXHEXBDS; hexbd++) {
             if((hexbd_mask & (1 << hexbd)) != 0) {
-
-                // tell skirocs to send data back
                 res = HEXBD_send_command(hexbd, CMD_STARTROPUL);
-		printf("Hi\n");
-
-            }// if hexbd_mask
-        }// hexbd loop
+            }
+        }
 
         usleep(HX_DELAY4);
 
-        int isFifoEmpty = 0;
-        printf("Waiting for fifo to empty\n");
+        isFifoEmpty = 0;
         while(!isFifoEmpty){
             isFifoEmpty = CTL_get_empty();
         }
-	printf("Fifo is empty\n");
 
     }// event loop
 
