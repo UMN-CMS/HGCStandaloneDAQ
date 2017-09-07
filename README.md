@@ -54,7 +54,8 @@ To add firmware to the `rdout/fw/` and `sync/fw/` directories, the hex files mus
 This section serves to outline exactly what happens when the `start_daq` script is run. The process is detailed below.
 
 1. Argument Processing
-  * Three arguments must be fed into the script: [RUN NUMBER] [EVENTS] and [PEDESTAL]. If these arguments are not supplied, the program defaults to run number 0 with 1000 events and real triggers.
+    * Three arguments must be fed into the script: [RUN NUMBER] [EVENTS] and [PEDESTAL]. If these arguments are not supplied, the program defaults to run number 0 with 1000 events and real triggers.
+
 2. File Copying to Raspberry Pis
   * The `~/rdout/` and `~/sync/` directories are created on the relevant Pis.
   * These directories are synchronized with the `rdout/` and `sync/` directories in the git repository using rsync.
