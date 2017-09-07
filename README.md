@@ -2,18 +2,10 @@
 
 ## Table of Contents
 * [HGCal Standalone DAQ](#hgcal-standalone-daq)
-  * [DAQ Execution](#daq-execution)
   * [Pre-Run Setup](#pre-run-setup)
+  * [DAQ Execution](#daq-execution)
   * [Data Output](#data-output)
   * [Raspberry Pi Software/Firmware](#raspberry-pi-softwarefirmware)
-
-
-## DAQ Execution
-To run, execute `start_daq` in the main directory. This defaults to run number 0 with 1000 events and real triggers. You can change the default settings by supplying the following arguments to `start_daq`:
-```
-./start_daq [RUN NUMBER] [EVENTS] [PEDESTAL]
-```
-Pedestals are not currently supported, so the PEDESTAL argument must be 0.
 
 
 ## Pre-Run Setup
@@ -27,6 +19,14 @@ As an example, if you have a SYNC Pi at 192.168.111.0 and a RDOUT Pi at 192.168.
 * `IPBUS_PREFIX` should be set to "192.168.112."
 
 Again, the Raspberry Pis' IPs must already be assigned!
+
+
+## DAQ Execution
+To run, execute `start_daq` in the main directory. This defaults to run number 0 with 1000 events and real triggers. You can change the default settings by supplying the following arguments to `start_daq`:
+```
+./start_daq [RUN NUMBER] [EVENTS] [PEDESTAL]
+```
+Pedestals are not currently supported, so the PEDESTAL argument must be 0.
 
 
 ## Data Output
