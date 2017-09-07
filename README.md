@@ -1,5 +1,12 @@
 # HGCal Standalone DAQ
 
+## Table of Contents
+* [HGCal Standalone DAQ](#hgcal-standalone-daq)
+  * [DAQ Execution](#daq-execution)
+  * [Pre-Run Setup](#pre-run-setup)
+  * [Data Output](#data-output)
+  * [Raspberry Pi Software/Firmware](#raspberry-pi-softwarefirmware)
+
 
 ## DAQ Execution
 To run, execute `start_daq` in the main directory. This defaults to run number 0 with 1000 events and real triggers. You can change the default settings by supplying the following arguments to `start_daq`:
