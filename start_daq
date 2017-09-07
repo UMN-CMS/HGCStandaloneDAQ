@@ -44,6 +44,7 @@ RDOUTDIR="$REPODIR/rdout"                   	# Folder containing software for RD
 SYNCDIR="$REPODIR/sync"                     	# Folder containing software for SYNC Pis
 COMMONDIR="$REPODIR/common"                     # Folder containing software common to RDOUT and SYNC Pis
 DATADIR="$REPODIR/data"                     	# Folder for the data files
+ETCDIR="$REPODIR/etc"                           # Folder containing extra scripts
 REMOTE_RDOUTDIR="~/rdout"                   	# Folder on Pi to contain RDOUT software
 REMOTE_SYNCDIR="~/sync"                     	# Folder on Pi to contain SYNC software
 
@@ -55,6 +56,7 @@ REMOTE_RDOUT_EXE="run_rdout"            	    # File to be executed on rdout Pis
 REMOTE_SYNC_EXE="run_sync"              	    # File to be executed on sync Pis
 ENDRDOUT="$REMOTE_RDOUTDIR/stop.run.please" 	# When created, this file stops the helper process on the rdout Pis
 ENDSYNC="$REMOTE_SYNCDIR/stop.run.please"   	# When created, this file stops the helper process on the sync Pis
+GENCONNPY="$ETCDIR/generateConnections.py"      # Python script to generate connections.xml
 
 # Arrays
 RDOUT_IPS=($(cat $RDOUT_IP_FILE))           	# Read rdout IPs into an array
@@ -69,6 +71,7 @@ DAQ_ARGS="$RUN_NUMBER $MAXEVENTS $PED $DATADIR" # Arguments fed to the DAQ
 RPI_PREFIX="192.168.222."                       # Prefix for the Pis' IP addresses
 IPBUS_PREFIX="192.168.220."                     # Prefix for the IPBus IP addresses
 IPB_MAC_PREFIX="08:00:32:00:ff:"                # Prefix for the IPBus MAC addresses
+GENCONNARGS="$IPBUS_PREFIX $RDOUT_IP_FILE"      # Arguments supplied to the connections.xml generator
 
 
 
@@ -164,6 +167,13 @@ done
 
 
 #################### DAQ ####################
+# Generate connections file
+python $GENCONNPY $GENCONNARGS
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+
 printf "\nStarting DAQ\n"
 cd $DAQDIR
 

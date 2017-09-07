@@ -2,7 +2,7 @@ import sys
 
 if len(sys.argv) != 3:
     print 'Incorrect arguments. Should be [IP PREFIX] [RDOUT FILE]'
-    exit()
+    exit(1)
 
 ip_prefix = sys.argv[1]
 rdout_file = open(sys.argv[2], 'r')
