@@ -63,9 +63,9 @@ This section serves to outline exactly what happens when the `start_daq` script 
 3. Firmware Install and Software Execution
     * The SYNCs are done first, then the RDOUTs.
     * The `run_rdout` or `run_sync` script is executed over ssh.
-        1. Firmware is installed using the firmware files specified in the script.
-        2. On RDOUTs, the IP/MAC addresses for IPBus are set.
-        3. The rdout or sync helper process is executed.
+        * Firmware is installed using the firmware files specified in the script.
+        * On RDOUTs, the IP/MAC addresses for IPBus are set.
+        * The rdout or sync helper process is executed.
     * Because the IPBus modules take a while to appear over the network, the script then waits until it gets a successful ping from each IPBus module.
 4. DAQ Execution
     * The connections.xml file is generated with a python script.
