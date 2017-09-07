@@ -6,6 +6,13 @@ To run, execute `start_daq` in the main directory. This defaults to run number 0
 ```
 Pedestals are not currently supported, so the PEDESTAL argument must be 0.
 
-Before running, update the `RPI_IP_PREFIX` and `IPBUS_PREFIX` variables in `start_daq` to match the IP prefix (first 3 octets, so "192.168.222.") for the Raspberry Pis and IPBus, respectively. The RPi IPs must have already been set, but the IPBus IPs are set on each run. The files `etc/rdout_ips.txt` and `etc/sync_ips.txt` must also be updated with the fourth octet of each RDOUT and SYNC board in use. For each board, place a number on a new line in the file, and make sure there are no blank lines in the file. The number placed in the file should be the last octet of the IP address used to connect to the Raspberry Pi. Again, the Raspberry Pis' IPs must already be assigned!
+Before running, update the `RPI_IP_PREFIX` and `IPBUS_PREFIX` variables in `start_daq` to match the IP prefix (first 3 octets, so "192.168.222.") for the Raspberry Pis and IPBus, respectively. The RPi IPs must have already been set, but the IPBus IPs are set on each run. The files `etc/rdout_ips.txt` and `etc/sync_ips.txt` must also be updated with the fourth octet of each RDOUT and SYNC board in use. For each board, place a number on a new line in the file, and make sure there are no blank lines in the file. The number placed in the file should be the last octet of the IP address used to connect to the Raspberry Pi. To clarify, if you have a syncboard Pi at 192.168.111.0 and a readoutboard at 192.168.111.1, and you'd like the IPBus IPs to begin with 192.168.112., then:
+* `etc/rdout_ips.txt` should contain one line with "1" on it
+* `etc/sync_ips.txt` should contain one line with "0" on it
+* `RPI_IP_PREFIX` should be set to "192.168.111."
+  * Don't forget the final dot in the prefix!
+* `IPBUS_PREFIX` should be set to "192.168.112."
+
+Again, the Raspberry Pis' IPs must already be assigned!
 
 Data files are outputted to the `data/` directory. An example filename is as follows: RUN0_05092017_154159.raw. If pedestals are used, the filename starts with PED_. The first set of digits is the date in ddmmyyyy format, and the second is the time of the run in hhmmss format.
