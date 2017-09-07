@@ -17,7 +17,7 @@ As an example, if you have a SYNC Pi at 192.168.111.0 and a RDOUT Pi at 192.168.
 * `etc/rdout_ips.txt` should contain one line with "1" on it
 * `etc/sync_ips.txt` should contain one line with "0" on it
 * `RPI_IP_PREFIX` should be set to "192.168.111."
- * Don't forget the final dot in the prefix!
+  * Don't forget the final dot in the prefix!
 * `IPBUS_PREFIX` should be set to "192.168.112."
 
 Again, the Raspberry Pis' IPs must already be assigned!
