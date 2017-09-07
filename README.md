@@ -56,9 +56,9 @@ This section serves to outline exactly what happens when the `start_daq` script 
 1. Argument Processing
   * Three arguments must be fed into the script: [RUN NUMBER] [EVENTS] and [PEDESTAL]. If these arguments are not supplied, the program defaults to run number 0 with 1000 events and real triggers.
 2. File Copying to Raspberry Pis
-  1. The `~/rdout/` and `~/sync/` directories are created on the relevant Pis.
-  2. These directories are synchronized with the `rdout/` and `sync/` directories in the git repository using rsync.
-  3. The `common/` folder is copied into each using scp.
+  * The `~/rdout/` and `~/sync/` directories are created on the relevant Pis.
+  * These directories are synchronized with the `rdout/` and `sync/` directories in the git repository using rsync.
+  * The `common/` folder is copied into each using scp.
 3. Firmware Install and Software Execution
   * The SYNCs are done first, then the RDOUTs.
   * The `run_rdout` or `run_sync` script is executed over ssh.
@@ -67,8 +67,8 @@ This section serves to outline exactly what happens when the `start_daq` script 
     3. The rdout or sync helper process is executed.
   * Because the IPBus modules take a while to appear over the network, the script then waits until it gets a successful ping from each IPBus module.
 4. DAQ Execution
-  1. The connections.xml file is generated with a python script.
-  2. The DAQ is compiled and executed.
+  * The connections.xml file is generated with a python script.
+  * The DAQ is compiled and executed.
 5. Closing Actions
-  1. The helper processes are ended on the Pis.
+  * The helper processes are ended on the Pis.
     * A file named "stop.run.please" is created on the Pi, and its presence ends the helpers as they continually check for the presence of this file.
