@@ -32,14 +32,10 @@ COMPILE="$RDOUTDIR/compile"
 IPEXE="$BINDIR/set_ip_mac_address"
 
 # Firmware Files
-DATA_FW="$FWDIR/data_orm_dly.hex"
-CTL_FW="$FWDIR/ctl_orm_dly.hex"
-#DATA_FW="$FWDIR/data_orm_ddrc.hex"
-#CTL_FW="$FWDIR/ctl_orm_ddrc.hex"
-#DATA_FW="$FWDIR/data_orm_ddr.hex"
-#CTL_FW="$FWDIR/ctl_orm_ddr.hex"
-#DATA_FW="$FWDIR/non_ddr/data_orm1.hex"
-#CTL_FW="$FWDIR/non_ddr/ctl_orm_rst.hex"
+DATA_FW="$FWDIR/data_orm_dly.hex"           # DDR
+CTL_FW="$FWDIR/ctl_orm_dly.hex"             # DDR
+#DATA_FW="$FWDIR/non_ddr/data_orm1.hex"     # NON DDR
+#CTL_FW="$FWDIR/non_ddr/ctl_orm_rst.hex"    # NON DDR
 
 # ORM Arrays
 DATA_ORMS=( 0 1 2 3 )
