@@ -16,7 +16,7 @@ then
     MAXEVENTS=1000
     PED=0
 else
-    echo "Usage: ./test_master_run [RUN NUMBER] [EVENTS] [PED]"
+    echo "Usage: ./start_daq [RUN NUMBER] [EVENTS] [PED]"
     exit
 fi
 
