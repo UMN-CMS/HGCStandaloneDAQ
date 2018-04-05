@@ -15,7 +15,7 @@
 //#define RDOUT_MASK ( PI1_MASK | PI2_MASK )
 //#define RDOUT_MASK (PI1_MASK | PI2_MASK | PI3_MASK )
 //#define RDOUT_MASK (PI1_MASK | PI2_MASK | PI3_MASK | AHCAL_MASK)
-#define RDOUT_MASK 0x0001
+#define RDOUT_MASK 0x0010
 
 // ANABLE_VETO1 Options:
 // 0 - ignores AHCAL
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	// Set the rdout_mask.
 	int rdout_mask;
 	rdout_mask = cables_mask;
-	rdout_mask = RDOUT_MASK; // for debug
+	// rdout_mask = RDOUT_MASK; // for debug
 	SYNC_put_rdout_mask(rdout_mask);
 	int mask;
 	mask = SYNC_get_rdout_mask();
