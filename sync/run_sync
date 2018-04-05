@@ -29,8 +29,7 @@ TRIGSTATUS="$BINDIR/get_trigger_enabled"
 COMPILE="$SYNCDIR/compile"
 
 # Firmware Files
-SYNC_FW="$FWDIR/sync_orm1.hex"
-CTL_FW="$FWDIR/ctl1.hex"
+SYNC_FW="$FWDIR/sync_orm_busy2.hex"
 
 # ORMs
 SYNC_ORM=4
