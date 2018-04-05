@@ -1,9 +1,13 @@
-RDOUT0
+RDOUT0 (outdated):
  - IPBus: 192.168.220.151
  - SSH: 192.168.222.151
+
 RDOUT1:
  - IPBus: 192.168.220.1
  - SSH: 192.168.222.1
 
-SYNC:
+SYNC (outdated):
  - SSH: 192.168.222.177
+
+SYNC:
+ - SSH: 192.168.222.2
